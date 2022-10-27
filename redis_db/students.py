@@ -1,3 +1,9 @@
+import os
+import sys
+currentdir = os.path.dirname(os.path.realpath(__file__))
+parentdir = os.path.dirname(currentdir)
+sys.path.append(parentdir)
+
 from table import Table
 import random
 import redis
@@ -22,7 +28,7 @@ class Students(Table):
   def fill(self, count):
     for i in range(1, count+1):
       key = self.__get_shifr()
-      self.update(key, f'Студент №{i}', f'21.10.200{i}')
+      self.insert(key, f'Студент №{i}', f'21.10.200{i}')
 
 
   def print_all(self):
@@ -40,12 +46,12 @@ class Students(Table):
     return self.redis_db.hgetall(key)
 
 
-  def update(self, key, fio, birthdate):
+  def insert(self, key, fio, birthdate):
     self.redis_db.hset(key, 'FIO', fio)
     self.redis_db.hset(key, 'Birthdate', birthdate)
 
 
-  def update_map(self, key, new_value):
+  def update(self, key, new_value):
     self.redis_db.hmset(key, new_value)
 
 

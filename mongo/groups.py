@@ -1,12 +1,19 @@
+import os
+import sys
+currentdir = os.path.dirname(os.path.realpath(__file__))
+parentdir = os.path.dirname(currentdir)
+sys.path.append(parentdir)
+
 import pprint
 from table import Table
-from mongo_manager import MongoManager
+from mongo.mongo_manager import MongoManager
 
 
 collection_name = 'groups'
 
 class Groups(Table):
   def __init__(self):
+    # TODO убрать settings в MongoManager
     settings = {
       'host': 'localhost', 
       'port': 27017

@@ -1,4 +1,10 @@
-from psql_manager import PsqlManager
+import os
+import sys
+currentdir = os.path.dirname(os.path.realpath(__file__))
+parentdir = os.path.dirname(currentdir)
+sys.path.append(parentdir)
+
+from postgresql.psql_manager import PsqlManager
 from table import Table
 import random
 

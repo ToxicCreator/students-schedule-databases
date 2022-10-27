@@ -11,16 +11,16 @@ class ElasticManager():
 
   def __init__(self):
     self.client = Elasticsearch('http://root:root@localhost:9200')
-    print("ElasticSearch connected successfully.")
+    print('ElasticSearch connected successfully.')
 
 
   def read(self, index):
-    resp = self.client.search(index="course", query = query)
+    # resp = self.client.search(index='course', query = query)
     resp = Search(using=self.client, index=index)
 
     if not resp['hits']['hits']:
-      print (f"\n{resp}")
-        
-    for i in range(len(resp["hits"]["hits"])):
+      print (f'\n{resp}')
+
+    for i in range(len(resp['hits']['hits'])):
       print()
-      print(resp["hits"]["hits"][i]["_source"])
+      print(resp['hits']['hits'][i]['_source'])

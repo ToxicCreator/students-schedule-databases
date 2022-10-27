@@ -1,9 +1,9 @@
 from datetime import date
-from graph import Graph
-from groups import Groups
-from lessons import Lessons
-from students import Students
-from visits import Visits
+from neo4j.graph import Graph
+from mongo.groups import Groups
+from postgresql.visits import Visits
+from postgresql.lessons import Lessons
+from redis_db.students import Students
 
 
 def mongo():
@@ -43,7 +43,7 @@ def redis():
   print('\nUpdate one:')
   new_value = students.read(shifr)
   new_value['FIO'] = 'Студент'
-  students.update_map(shifr, new_value)
+  students.update(shifr, new_value)
   students.print(shifr)
   
   print('\nDelete all students')
@@ -93,10 +93,10 @@ def neo4j():
 
 def main():
   # mongo()
-  # redis()
+  redis()
   # postgres()
   # elastic()
-  neo4j()
+  # neo4j()
 
 
 if __name__ == "__main__":

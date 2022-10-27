@@ -1,8 +1,14 @@
-from psql_manager import PsqlManager
-from table import Table
-from datetime import date
-from faker import Faker
+import os
+import sys
+currentdir = os.path.dirname(os.path.realpath(__file__))
+parentdir = os.path.dirname(currentdir)
+sys.path.append(parentdir)
+
 import random
+from faker import Faker
+from datetime import date
+from postgresql.psql_manager import PsqlManager
+from table import Table
 
 
 week_count = 53
