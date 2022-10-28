@@ -35,7 +35,8 @@ class Neo4jManager():
     query = f'''
       MATCH (from) WITH from
       MATCH (to)
-        WHERE ID(from) = {from_.id} AND ID(to) = {to.id}
+        WHERE ID(from) = {from_.element_id} 
+        AND ID(to) = {to.element_id}
       CREATE (from)-[rel:{label}]->(to) 
       RETURN from, to, rel;
     '''

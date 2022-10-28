@@ -4,6 +4,7 @@ from mongo.groups import Groups
 from postgresql.visits import Visits
 from postgresql.lessons import Lessons
 from redis_db.students import Students
+from elastic.descriptions import Descriptions
 
 
 def mongo():
@@ -83,7 +84,33 @@ def postgres():
 
 
 def elastic():
-  pass
+  print('\n--== ElasticSearch ==--')
+  desc = Descriptions()
+
+  print('\nCreate & read all:')
+  desc.fill()
+  desc.print_all()
+
+  print('\nRead:')
+  desc.print({
+    "Name": "Математический анализ",
+    "Type": "Лекция"
+  })
+
+  print('\nUpdate value:')
+  desc.update({
+    "Name": "Математический анализ",
+    "Type": "Лекция"
+  }, {
+    "Name": "Матанализ"
+  })
+  desc.print_all()
+
+  print('\nDelete:')
+  desc.delete({
+    "Name": "Технологии программирования"
+  })
+  desc.print_all()
 
 
 def neo4j():
@@ -91,11 +118,12 @@ def neo4j():
   graph.fill()
   graph.print_all()
 
+
 def main():
   # mongo()
-  redis()
+  # redis()
   # postgres()
-  # elastic()
+  elastic()
   # neo4j()
 
 
