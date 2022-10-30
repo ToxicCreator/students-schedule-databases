@@ -1,5 +1,5 @@
 from datetime import date
-from neo4j.graph import Graph
+from neo4j_db.graph import Graph
 from mongo.groups import Groups
 from postgresql.visits import Visits
 from postgresql.lessons import Lessons
@@ -120,11 +120,11 @@ def neo4j():
 
 
 def main():
-  mongo()
+  # mongo()
   # redis()
   # postgres()
   # elastic()
-  # neo4j()
+  neo4j()
 
 
 if __name__ == "__main__":
