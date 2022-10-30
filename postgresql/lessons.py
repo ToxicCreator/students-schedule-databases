@@ -31,8 +31,7 @@ class Lessons(Table):
   def __init__(self):
     self.psql = PsqlManager()
     self.clear()
-    if not self.psql.check_table_exist(self.TABLE_NAME):
-      self.create_table()
+    self.create_table()
     self.create_partition()
 
 
@@ -43,13 +42,27 @@ class Lessons(Table):
   def get_types(self):
     return self.TYPES
 
+  # CREATE TABLE IF NOT EXISTS lessons (
+  #   type VARCHAR(40) NOT NULL,
+  #   lesson_date TIMESTAMP NOT NULL,
+  #   name VARCHAR(70) NOT NULL
+  # ) PARTITION BY range(date_part('week', lesson_date));
+
+  # create table lessons1 partition of lessons for values from (1) to (2);
+  # create table lessons2 partition of lessons for values from (2) to (3);
+
+  # insert into lessons select 'Лекция', '2022-01-03', 'Физика';
+
+  # update lessons set lesson_date = '2022-01-10' where name = 'Физика';
+
+  # select * from lessons;
 
   def create_table(self):
     query = f'''
-      CREATE TABLE {self.TABLE_NAME} (
+      CREATE TABLE IF NOT EXISTS {self.TABLE_NAME} (
         id SERIAL PRIMARY KEY NOT NULL,
         type VARCHAR(40) NOT NULL,
-        date TIMESTAMP NOT NULL,
+        lesson_date TIMESTAMP NOT NULL,
         name VARCHAR(70) NOT NULL
       );
     '''
@@ -63,13 +76,13 @@ class Lessons(Table):
         print()
       if self.psql.check_table_exist(part_name):
         continue
-      print(f'Create partition "{part_name}"')
       query = f'''
-        CREATE TABLE {part_name} (
-          CHECK ( date_part('week', date) = {week_number})
-        ) INHERITS ({self.TABLE_NAME})
+        CREATE TABLE IF NOT EXISTS {part_name} (
+          CHECK (date_part('week', lesson_date) = {week_number})
+        ) INHERITS ({self.TABLE_NAME});
       '''
       self.psql.execute_and_commit(query)
+      print(f'Create partition "{part_name}"')
     self.create_partition_trigger()
 
 
@@ -84,7 +97,7 @@ class Lessons(Table):
       BEGIN
         partition_name := format(
           '{self.TABLE_NAME}%s', 
-          date_part('week', NEW.date)::integer
+          date_part('week', NEW.lesson_date)::integer
         );
         execute 'INSERT INTO ' || partition_name || ' VALUES (($1).*)' USING NEW;
         RETURN null;
@@ -103,7 +116,7 @@ class Lessons(Table):
   def insert(self, type, date, name):
     self.psql.insert(self.TABLE_NAME, {
       'type': type,
-      'date': date,
+      'lesson_date': date,
       'name': name
     })
 
@@ -121,7 +134,7 @@ class Lessons(Table):
     query = f'''
       SELECT * FROM {self.TABLE_NAME} 
       WHERE type = '{search['type']}' 
-        AND date = '{search['date']}' 
+        AND lesson_date = '{search['lesson_date']}' 
         AND name = '{search['name']}'
     '''
     self.psql.execute_and_commit(query)
@@ -146,7 +159,7 @@ class Lessons(Table):
   def update_date(self, id, date):
     query = f'''
       UPDATE {self.TABLE_NAME} set
-        date = '{date}'
+        lesson_date = '{date}'
       WHERE id = {id}
     '''
     self.psql.execute_and_commit(query)
