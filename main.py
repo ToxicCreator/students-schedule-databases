@@ -120,10 +120,10 @@ def neo4j():
 
 
 def main():
-  # mongo()
+  mongo()
   # redis()
   # postgres()
-  elastic()
+  # elastic()
   # neo4j()
 
 

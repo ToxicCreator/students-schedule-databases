@@ -30,6 +30,7 @@ class Lessons(Table):
 
   def __init__(self):
     self.psql = PsqlManager()
+    self.clear()
     if not self.psql.check_table_exist(self.TABLE_NAME):
       self.create_table()
     self.create_partition()
@@ -58,6 +59,8 @@ class Lessons(Table):
   def create_partition(self):
     for week_number in range (1, week_count):
       part_name = f'{self.TABLE_NAME}{week_number}'
+      if week_number == 43:
+        print()
       if self.psql.check_table_exist(part_name):
         continue
       print(f'Create partition "{part_name}"')

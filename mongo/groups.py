@@ -11,14 +11,9 @@ from mongo.mongo_manager import MongoManager
 
 collection_name = 'groups'
 
-class Groups(Table):
+class Groups():
   def __init__(self):
-    # TODO убрать settings в MongoManager
-    settings = {
-      'host': 'localhost', 
-      'port': 27017
-    }
-    self.mongo = MongoManager(settings, 'crud')
+    self.mongo = MongoManager('crud')
     self.groups_collection = self.mongo.collection(collection_name)
 
 

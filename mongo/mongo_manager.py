@@ -2,16 +2,16 @@ from pymongo import MongoClient;
 
 
 class MongoManager():
-  def __new__(self):
+  def __new__(self, db_name):
     if not hasattr(self, 'instance'):
       self.instance = super(MongoManager, self).__new__(self)
     return self.instance
 
 
-  def __init__(self, settings, db_name):
+  def __init__(self, db_name):
     client = MongoClient(
-      settings['host'], 
-      settings['port']
+      'localhost', 
+      27017
     )
     self.db = client[db_name]
 
