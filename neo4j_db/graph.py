@@ -4,7 +4,7 @@ currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
 
-from neo4j_manager import Neo4jManager
+from neo4j_db.neo4j_manager import Neo4jManager
 
 
 class Graph():

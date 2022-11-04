@@ -14,8 +14,7 @@ class Visits(Table):
 
   def __init__(self):
     self.psql = PsqlManager()
-    if not self.psql.check_table_exist(self.TABLE_NAME):
-      self.create_table()
+    self.create_table()
 
 
   def __del__(self):
@@ -24,7 +23,7 @@ class Visits(Table):
 
   def create_table(self):
     query = f'''
-      CREATE TABLE {self.TABLE_NAME} (
+      CREATE TABLE IF NOT EXISTS {self.TABLE_NAME} (
         student INT NOT NULL,
         lesson INT NULL
       );
@@ -79,11 +78,11 @@ class Visits(Table):
   def print(self, studentID, lessonID):
     rows = self.read(studentID, lessonID)
     for row in rows:
-      print('student =', row[1], 'lesson =', row[2])
+      print('student =', row[0], 'lesson =', row[1])
 
 
   def print_all(self):
     rows = self.psql.select_all(self.TABLE_NAME)
     print('Table:', self.TABLE_NAME)
     for row in rows:
-      print('student =', row[1], 'lesson =', row[2])
+      print('student =', row[0], 'lesson =', row[1])

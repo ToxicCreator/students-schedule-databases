@@ -1,5 +1,5 @@
 from datetime import date
-from neo4j.graph import Graph
+from neo4j_db.graph import Graph
 from mongo.groups import Groups
 from postgresql.visits import Visits
 from postgresql.lessons import Lessons
@@ -76,10 +76,10 @@ def postgres():
   lessons.insert(type, new_date, name)
   id = lessons.read({
     'type': type,
-    'date': new_date,
+    'lesson_date': new_date,
     'name': name
   })[0][0]
-  lessons.update(id, date=(date(2022, 10, 22)))
+  lessons.update(id, name='Физика')
   lessons.print(id)
 
 
@@ -120,9 +120,9 @@ def neo4j():
 
 
 def main():
-  mongo()
+  # mongo()
   # redis()
-  # postgres()
+  postgres()
   # elastic()
   # neo4j()
 
