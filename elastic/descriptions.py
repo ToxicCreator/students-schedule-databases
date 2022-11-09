@@ -27,10 +27,10 @@ class Descriptions(Table):
     self.manager.delete_index(self.INDEX_NAME)
 
 
-  def insert(self, document):
+  def insert(self, type, description, tag, lesson_id):
     return self.manager.create_document(
       self.INDEX_NAME,
-      document
+      {type, description, tag, lesson_id}
     )
 
 

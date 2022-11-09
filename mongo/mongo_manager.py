@@ -1,6 +1,6 @@
 from pymongo import MongoClient;
 
-
+# docker run -d --name mongo-cnt -p 27017:27017 mongo
 class MongoManager():
   def __new__(self, db_name):
     if not hasattr(self, 'instance'):
