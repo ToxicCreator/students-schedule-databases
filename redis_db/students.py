@@ -10,6 +10,8 @@ import redis
 
 
 class Students(Table):
+  __shifrs = set()
+
   def __init__(self):
     self.redis_db = redis.Redis(
       host='localhost', 
@@ -18,37 +20,21 @@ class Students(Table):
       charset='UTF-8',
       decode_responses=True
     )
-    self.shifrs = set()
 
 
   def get_shifrs(self):
-    return self.shifrs
-
-
-  def fill(self, count):
-    for i in range(1, count+1):
-      key = self.__get_shifr()
-      self.insert(key, f'Студент №{i}', f'21.10.200{i}')
-
-
-  def print_all(self):
-    keys = self.redis_db.keys('*')
-    for key in keys:
-      self.print(key)
-
-
-  def print(self, key):
-    student = self.read(key)
-    print(key, student)
+    return self.__shifrs
 
 
   def read(self, key):
     return self.redis_db.hgetall(key)
 
 
-  def insert(self, key, fio, birthdate):
-    self.redis_db.hset(key, 'FIO', fio)
-    self.redis_db.hset(key, 'Birthdate', birthdate)
+  def insert(self, name, group_name):
+    key = self.__get_shifr()
+    self.redis_db.hset(key, 'name', name)
+    self.redis_db.hset(key, 'groupName', group_name)
+    return key
 
 
   def update(self, key, new_value):
@@ -62,11 +48,11 @@ class Students(Table):
 
 
   def __get_shifr(self):
-    shifr = [random.choice('АБВГ') for _ in range(3)]
+    shifr = [random.choice('АБВГД') for _ in range(3)]
     shifr.append('-')
     shifr += [random.choice('0123456789') for _ in range(5)]
     shifr = ''.join(shifr)
-    if shifr in self.shifrs:
+    if shifr in self.__shifrs:
       return self.__get_shifr()
-    self.shifrs.add(shifr)
+    self.__shifrs.add(shifr)
     return shifr
