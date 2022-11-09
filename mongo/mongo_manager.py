@@ -9,10 +9,7 @@ class MongoManager():
 
 
   def __init__(self, db_name):
-    client = MongoClient(
-      'localhost', 
-      27017
-    )
+    client = MongoClient("mongodb://localhost:27017/")
     self.db = client[db_name]
 
 
