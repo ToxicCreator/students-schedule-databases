@@ -9,25 +9,9 @@ class Table(ABC):
   @abstractmethod
   def insert(self, *args):
     NotImplemented
-  
-  @abstractmethod
-  def update(self, search, new_value):
-    NotImplemented
 
   @abstractmethod
   def read(self, search):
-    NotImplemented
-
-  @abstractmethod
-  def fill(self, count):
-    NotImplemented
-
-  @abstractmethod
-  def print(self, searchID):
-    NotImplemented
-
-  @abstractmethod
-  def print_all(self):
     NotImplemented
 
   @abstractmethod
