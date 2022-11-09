@@ -15,18 +15,6 @@ week_count = 53
 
 class Lessons(Table):
   TABLE_NAME = 'lessons'
-  TYPES = {
-    'practica': 'Практика',
-    'lecture': 'Лекция',
-    'labaratory': 'Лабараторная'
-  }
-  NAMES = [
-    'Математический анализ',
-    'Физика',
-    'История',
-    'Технологии программирования',
-    'Линейная алгебра'
-  ]
 
   def __init__(self):
     self.psql = PsqlManager()
@@ -35,35 +23,13 @@ class Lessons(Table):
     self.create_partition()
 
 
-  def __del__(self):
-    self.clear()
-
-
-  def get_types(self):
-    return self.TYPES
-
-  # CREATE TABLE IF NOT EXISTS lessons (
-  #   type VARCHAR(40) NOT NULL,
-  #   lesson_date TIMESTAMP NOT NULL,
-  #   name VARCHAR(70) NOT NULL
-  # ) PARTITION BY range(date_part('week', lesson_date));
-
-  # create table lessons1 partition of lessons for values from (1) to (2);
-  # create table lessons2 partition of lessons for values from (2) to (3);
-
-  # insert into lessons select 'Лекция', '2022-01-03', 'Физика';
-
-  # update lessons set lesson_date = '2022-01-10' where name = 'Физика';
-
-  # select * from lessons;
-
   def create_table(self):
     query = f'''
       CREATE TABLE IF NOT EXISTS {self.TABLE_NAME} (
         id SERIAL PRIMARY KEY NOT NULL,
         type VARCHAR(40) NOT NULL,
         lesson_date TIMESTAMP NOT NULL,
-        name VARCHAR(70) NOT NULL
+        courseID SMALLINT NOT NULL
       );
     '''
     self.psql.execute_and_commit(query)
@@ -82,9 +48,7 @@ class Lessons(Table):
         ) INHERITS ({self.TABLE_NAME});
       '''
       self.psql.execute_and_commit(query)
-      print(f'Create partition "{part_name}"')
     self.create_partition_trigger()
-
 
   def create_partition_trigger(self):
     trigger_name = 'insertPartition'
@@ -113,11 +77,12 @@ class Lessons(Table):
     '''
     self.psql.execute_and_commit(query)
 
-  def insert(self, type, date, name):
+
+  def insert(self, type, lesson_date, courseID):
     self.psql.insert(self.TABLE_NAME, {
       'type': type,
-      'lesson_date': date,
-      'name': name
+      'lesson_date': lesson_date,
+      'courseID': courseID
     })
 
 
@@ -130,12 +95,12 @@ class Lessons(Table):
     return self.psql.cursor.fetchall()
 
 
-  def read(self, search):
+  def read(self, type, lesson_date, course_id):
     query = f'''
       SELECT * FROM {self.TABLE_NAME} 
-      WHERE type = '{search['type']}' 
-        AND lesson_date = '{search['lesson_date']}' 
-        AND name = '{search['name']}'
+      WHERE type = '{type}' 
+        AND lesson_date = '{lesson_date}' 
+        AND courseID = '{course_id}'
     '''
     self.psql.execute_and_commit(query)
     return self.psql.cursor.fetchall()

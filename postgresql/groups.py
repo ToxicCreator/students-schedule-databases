@@ -4,43 +4,43 @@ currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
 
-from postgresql.psql_manager import PsqlManager
 from table import Table
+from postgresql.psql_manager import PsqlManager
 
 
-class Visits(Table):
-  TABLE_NAME = 'visits'
+class Groups(Table):
+  TABLE_NAME = 'groups'
 
-  def __init__(self):
+  def __init__(self, clear=False):
     self.psql = PsqlManager()
+    if clear: self.clear()
     self.create_table()
 
 
   def create_table(self):
     query = f'''
       CREATE TABLE IF NOT EXISTS {self.TABLE_NAME} (
-        lesson INT NULL,
-        student VARCHAR(9) NOT NULL,
-        visited BOOLEAN DEFAULT false
+        name VARCHAR(10) PRIMARY KEY NOT NULL,
+        code VARCHAR(8) NOT NULL
       );
     '''
     self.psql.execute_and_commit(query)
 
 
-  def insert(self, lesson_id, student_id, visited=False):
-    map_key_values = {
-      'lesson': lesson_id,
-      'student': student_id,
-      'visited': visited
+  def insert(self, name, code):
+    values = {
+      'name': name,
+      'code': code
     }
-    self.psql.insert(self.TABLE_NAME, map_key_values)
+    if self.psql.insert(self.TABLE_NAME, values):
+      return name
+    return False
 
 
-  def read(self, studentID, lessonID):
+  def read(self, name):
     query = f'''
       SELECT * FROM {self.TABLE_NAME} 
-      WHERE student = {studentID} 
-        AND lesson = {lessonID}
+      WHERE name = {name}
     '''
     self.psql.execute_and_commit(query)
     return self.psql.cursor.fetchall()

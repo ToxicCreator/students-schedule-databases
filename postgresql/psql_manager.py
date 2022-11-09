@@ -1,20 +1,21 @@
 import psycopg2
 
+# docker run -d --name postgres-cnt -p 5432:5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgrespw postgres
 
 class PsqlManager():
   def __new__(self):
     if not hasattr(self, 'instance'):
-      self.instance = super(PsqlManager, self).__new__(self)
+        self.instance = super(PsqlManager, self).__new__(self)
     return self.instance
 
 
-  def __init__(self, settings=None):
+  def __init__(self):
     self.connection = psycopg2.connect(
       database="postgres", 
       user="postgres", 
       password="postgrespw", 
       host="host.docker.internal", 
-      port="5050"
+      port=49153
     )
     print("PostgreSQL connected successfully.")
     self.cursor = self.connection.cursor()
@@ -38,9 +39,15 @@ class PsqlManager():
 
 
   def insert(self, table_name, map_key_values):
-    query = f'INSERT INTO {table_name}'
-    query += self.__get_query_insert_arguments(map_key_values)
-    self.execute_and_commit(query)
+    try:
+      query = f'INSERT INTO {table_name}'
+      query += self.__get_query_insert_arguments(map_key_values)
+      self.execute_and_commit(query)
+      return True
+    except Exception as inst:
+      print(type(inst))
+      print(inst.args)
+      return False
 
 
   def __get_query_insert_arguments(self, map_key_values):
@@ -67,7 +74,6 @@ class PsqlManager():
       TRUNCATE {table_name};
     '''
     self.execute_and_commit(query)
-    print(f'Table "{table_name}" clear.')
 
 
   def drop_table(self, table_name):
