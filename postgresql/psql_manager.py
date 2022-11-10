@@ -20,6 +20,10 @@ class PsqlManager():
     self.cursor = self.connection.cursor()
 
 
+  def __del__(self):
+    self.connection.close()
+
+
   def execute_and_commit(self, query):
     self.cursor.execute(query)
     self.connection.commit()

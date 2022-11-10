@@ -6,6 +6,7 @@ sys.path.append(parentdir)
 
 from table import Table
 from postgresql.psql_manager import PsqlManager
+from neo4j_db.graph import Graph
 
 
 class Groups(Table):
@@ -13,6 +14,7 @@ class Groups(Table):
 
   def __init__(self, clear=False):
     self.psql = PsqlManager()
+    self.graph = Graph()
     if clear: self.clear()
     self.create_table()
 
@@ -33,6 +35,7 @@ class Groups(Table):
       'code': code
     }
     if self.psql.insert(self.TABLE_NAME, values):
+      self.graph.create_group_node(name, code)
       return name
     return False
 

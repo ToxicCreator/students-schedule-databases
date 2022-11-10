@@ -6,6 +6,7 @@ sys.path.append(parentdir)
 
 from table import Table
 from postgresql.psql_manager import PsqlManager
+from neo4j_db.graph import Graph
 
 
 class Courses(Table):
@@ -13,6 +14,7 @@ class Courses(Table):
 
   def __init__(self, clear=False):
     self.psql = PsqlManager()
+    self.graph = Graph()
     if clear: self.clear()
     self.create_table()
 
@@ -35,7 +37,9 @@ class Courses(Table):
       'sp_code': sp_code,
       'duration': duration
     }
-    return self.psql.insert(self.TABLE_NAME, values)[0]
+    id = self.psql.insert(self.TABLE_NAME, values)[0]
+    self.graph.create_course_node(id, values)
+    return id
 
 
   # def get_id(self, name, specialitiesCode, duration):

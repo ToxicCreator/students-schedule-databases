@@ -1,6 +1,7 @@
 import random
 from faker import Faker
 
+from neo4j_db.graph import Graph
 from mongo.institutes import Institutes
 from postgresql.courses import Courses
 from postgresql.groups import Groups
@@ -21,6 +22,9 @@ TYPES = [
 
 def fill():
   Faker.seed(0)
+  graph = Graph()
+  graph.clear()
+  
   specialities_codes = __fill_institutes()
 
   courses_id = __fill_courses(specialities_codes, min_duration=2, max_duration=4)
@@ -79,7 +83,7 @@ def __fill_lessons(courses_id: list):
     lesson_count = int(duration / 2)
     groups = courses.get_groups(course_id)
     for group in groups:
-      for lesson_number in range(1, lesson_count):
+      for lesson_number in range(1, lesson_count + 1):
         type = random.choice(TYPES)
         lesson_date = get_lesson_date(lesson_number, lesson_count)
         lesson_id = lessons.insert(type, lesson_date, course_id)
