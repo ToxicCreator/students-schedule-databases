@@ -11,8 +11,9 @@ from table import Table
 class Visits(Table):
   TABLE_NAME = 'visits'
 
-  def __init__(self):
+  def __init__(self, clear=False):
     self.psql = PsqlManager()
+    if clear: self.clear()
     self.create_table()
 
 

@@ -16,9 +16,10 @@ class Descriptions(Table):
   TABLE_NAME = 'description'
   INDEX_NAME = 'lessons'
 
-  def __init__(self):
+  def __init__(self, clear=False):
     self.manager = ElasticManager()
-    self.manager.delete_index(self.INDEX_NAME)
+    if clear:
+      self.manager.delete_index(self.INDEX_NAME)
     self.lessons_index = self.manager.create_index(
       self.INDEX_NAME
     )

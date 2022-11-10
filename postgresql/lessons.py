@@ -16,9 +16,9 @@ week_count = 53
 class Lessons(Table):
   TABLE_NAME = 'lessons'
 
-  def __init__(self):
+  def __init__(self, clear=False):
     self.psql = PsqlManager()
-    self.clear()
+    if clear: self.clear()
     self.create_table()
     self.create_partition()
 
@@ -79,31 +79,20 @@ class Lessons(Table):
 
 
   def insert(self, type, lesson_date, courseID):
-    self.psql.insert(self.TABLE_NAME, {
+    return self.psql.insert(self.TABLE_NAME, {
       'type': type,
       'lesson_date': lesson_date,
       'courseID': courseID
-    })
+    })[0]
 
 
-  def read_by_id(self, id):
+  def read(self, id):
     query = f'''
       SELECT * FROM {self.TABLE_NAME} 
       WHERE id = {id}
     '''
     self.psql.execute_and_commit(query)
-    return self.psql.cursor.fetchall()
-
-
-  def read(self, type, lesson_date, course_id):
-    query = f'''
-      SELECT * FROM {self.TABLE_NAME} 
-      WHERE type = '{type}' 
-        AND lesson_date = '{lesson_date}' 
-        AND courseID = '{course_id}'
-    '''
-    self.psql.execute_and_commit(query)
-    return self.psql.cursor.fetchall()
+    return self.psql.cursor.fetchone()
 
 
   def update(self, id, type=False, date=False, name=False):
@@ -139,45 +128,18 @@ class Lessons(Table):
     self.psql.execute_and_commit(query)
 
 
-  def fill(self, count):
-    Faker.seed(0)
-    fake = Faker()
-    for _ in range(count):
-      random_type_key = random.choice(list(self.TYPES.keys()))
-      random_type = self.TYPES[random_type_key]
-      
-      random_date = fake.date_between(
-        date(2022, 1, 1), 
-        date(2022, 12, 31)
-      )
-
-      random_name = random.choice(self.NAMES)
-      
-      self.insert(random_type, random_date, random_name)
-
-
   def clear(self):
     for week_number in range (1, week_count):
       self.psql.clear_table(f'{self.TABLE_NAME}{week_number}')
     self.psql.clear_table(self.TABLE_NAME)
 
 
-  def print(self, id):
-    rows = self.read_by_id(id)
-    print('---------------------------')
-    for row in rows:
-      print('type =', row[1])
-      print('date =', row[2])
-      print('name =', row[3])
-      print('---------------------------')
+  def get_course(self, id):
+    return self.read(id)[3]
 
 
-  def print_all(self):
-    rows = self.psql.select_all(self.TABLE_NAME)
-    print('Table:', self.TABLE_NAME)
-    print('---------------------------')
-    for row in rows:
-      print('type =', row[1])
-      print('date =', row[2])
-      print('name =', row[3])
-      print('---------------------------')
+# LessonsGroup
+# SELECT lessons.id as lesson, groups.name as group 
+# FROM courses 
+# 	JOIN groups ON courses.sp_code = groups.code 
+# 	JOIN lessons ON courses.id = lessons.courseID;

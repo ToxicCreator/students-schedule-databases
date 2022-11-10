@@ -45,11 +45,10 @@ class Graph():
     })
 
 
-  def create_group_node(self, name, course):
+  def create_group_node(self, name):
     label = self.NODE_LABELS['group']
     return self.client.create_node(label, { 
       'name': name,
-      'course': course
     })
 
 

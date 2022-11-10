@@ -12,7 +12,7 @@ import redis
 class Students(Table):
   __shifrs = set()
 
-  def __init__(self):
+  def __init__(self, clear=False):
     self.redis_db = redis.Redis(
       host='localhost', 
       port=6379, 
@@ -20,6 +20,7 @@ class Students(Table):
       charset='UTF-8',
       decode_responses=True
     )
+    if clear: self.clear()
 
 
   def get_shifrs(self):

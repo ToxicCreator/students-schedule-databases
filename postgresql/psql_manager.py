@@ -17,7 +17,6 @@ class PsqlManager():
       host="host.docker.internal", 
       port=49153
     )
-    print("PostgreSQL connected successfully.")
     self.cursor = self.connection.cursor()
 
 
@@ -42,6 +41,10 @@ class PsqlManager():
     query = f'INSERT INTO {table_name}'
     query += self.__get_query_insert_arguments(map_key_values)
     self.execute_and_commit(query)
+    query = f'SELECT * FROM {table_name}'
+    query += self.__get_query_where_arguments(map_key_values)
+    self.execute_and_commit(query)
+    return self.cursor.fetchone()
 
 
   def __get_query_insert_arguments(self, map_key_values):
@@ -50,6 +53,16 @@ class PsqlManager():
       map_key_values[key] = str(map_key_values[key])
     values = map_key_values.values()
     query += f''' VALUES ('{"', '".join(values)}\')'''
+    return query
+
+
+  def __get_query_where_arguments(self, map_key_values):
+    query = f' WHERE '
+    arguments = []
+    for key in map_key_values.keys():
+      value = map_key_values[key]
+      arguments.append(f"{key} = '{value}'")
+    query += ' AND '.join(arguments)
     return query
 
 
@@ -64,15 +77,11 @@ class PsqlManager():
   def clear_table(self, table_name):
     if not self.check_table_exist(table_name):
       return
-    query = f'''
-      TRUNCATE {table_name};
-    '''
+    query = f'TRUNCATE {table_name};'
     self.execute_and_commit(query)
 
 
   def drop_table(self, table_name):
-    query = f'''
-      DROP TABLE IF EXISTS {table_name};
-    '''
+    query = f'DROP TABLE IF EXISTS {table_name};'
     self.execute_and_commit(query)
     print(f'Table "{table_name}" die.')

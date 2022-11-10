@@ -11,9 +11,9 @@ from postgresql.psql_manager import PsqlManager
 class Groups(Table):
   TABLE_NAME = 'groups'
 
-  def __init__(self):
+  def __init__(self, clear=False):
     self.psql = PsqlManager()
-    self.clear()
+    if clear: self.clear()
     self.create_table()
 
 
@@ -43,8 +43,12 @@ class Groups(Table):
       WHERE name = {name}
     '''
     self.psql.execute_and_commit(query)
-    return self.psql.cursor.fetchall()
+    return self.psql.cursor.fetchone()
 
 
   def clear(self):
     self.psql.clear_table(self.TABLE_NAME)
+
+
+  def get_speciality(self, id):
+    return self.read(id)[1]
