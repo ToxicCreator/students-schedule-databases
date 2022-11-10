@@ -11,9 +11,9 @@ from postgresql.psql_manager import PsqlManager
 class Groups(Table):
   TABLE_NAME = 'groups'
 
-  def __init__(self, clear=False):
+  def __init__(self):
     self.psql = PsqlManager()
-    if clear: self.clear()
+    self.clear()
     self.create_table()
 
 

@@ -18,19 +18,21 @@ class Descriptions(Table):
 
   def __init__(self):
     self.manager = ElasticManager()
+    self.manager.delete_index(self.INDEX_NAME)
     self.lessons_index = self.manager.create_index(
       self.INDEX_NAME
     )
 
 
-  def __del__(self):
-    self.manager.delete_index(self.INDEX_NAME)
-
-
   def insert(self, type, description, tag, lesson_id):
     return self.manager.create_document(
       self.INDEX_NAME,
-      {type, description, tag, lesson_id}
+      {
+        'type': type, 
+        'description': description, 
+        'tag': tag, 
+        'lessonId': lesson_id
+      }
     )
 
 

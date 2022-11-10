@@ -39,15 +39,9 @@ class PsqlManager():
 
 
   def insert(self, table_name, map_key_values):
-    try:
-      query = f'INSERT INTO {table_name}'
-      query += self.__get_query_insert_arguments(map_key_values)
-      self.execute_and_commit(query)
-      return True
-    except Exception as inst:
-      print(type(inst))
-      print(inst.args)
-      return False
+    query = f'INSERT INTO {table_name}'
+    query += self.__get_query_insert_arguments(map_key_values)
+    self.execute_and_commit(query)
 
 
   def __get_query_insert_arguments(self, map_key_values):

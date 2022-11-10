@@ -8,7 +8,7 @@ from table import Table
 import random
 import redis
 
-
+# docker run -d --name redis-cnt -p 6379:6379 redis
 class Students(Table):
   __shifrs = set()
 

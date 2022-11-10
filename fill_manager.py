@@ -41,24 +41,25 @@ def __fill_institutes():
 
 
 def __fill_groups(specialities_codes):
-  groups_names = []
+  groups_names = set()
   groups = Groups()
   for i in range(len(specialities_codes)):
     for group_number in range(1, random.randint(1, 4)):
       code = specialities_codes[i]
-      is_inserted = False
-      group_name = None
-      while not is_inserted:
+      while True:
         group_name = generate_group_name(group_number)
-        is_inserted = groups.insert(group_name, code)
-      groups_names.append(group_name)
-  return groups_names
+        if group_name in groups_names:
+          continue
+        groups.insert(group_name, code)
+        groups_names.add(group_name)
+        break
+  return list(groups_names)
 
 
 def __fill_lessons(courses_id, min=1, max=1):
   lessons_id = []
   lessons = Lessons()
-  # descriptions = Descriptions()
+  descriptions = Descriptions()
   for course_id in courses_id:
     for lesson_number in range(min, random.randint(min, max)):
       type = random.choice(TYPES)
@@ -68,7 +69,7 @@ def __fill_lessons(courses_id, min=1, max=1):
       lesson = lessons.read(type, lesson_date, course_id)
       lesson_id = lesson[0][0]
       lessons_id.append(lesson_id)
-      # descriptions.insert()
+      descriptions.insert(type, 'Описание', '', lesson_id)
   return lessons_id
 
 
@@ -84,13 +85,13 @@ def __fill_groups_lessons(groups_names, lessons_id):
   return groups_lessons_map
 
 
-def __fill_students(groups_names):
+def __fill_students(groups_names, min=10, max=30):
   students = Students()
   fake = Faker()
   groups_students = {}
   for group_name in groups_names:
     groups_students[group_name] = []
-    count = random.randint(10, 30)
+    count = random.randint(min, max)
     for i in range(count):
       student = students.insert(fake.name(), group_name)
       groups_students[group_name].append(student)
