@@ -129,17 +129,8 @@ class Lessons(Table):
 
 
   def clear(self):
-    for week_number in range (1, week_count):
-      self.psql.clear_table(f'{self.TABLE_NAME}{week_number}')
-    self.psql.clear_table(self.TABLE_NAME)
+    self.psql.drop_table(self.TABLE_NAME)
 
 
   def get_course(self, id):
     return self.read(id)[3]
-
-
-# LessonsGroup
-# SELECT lessons.id as lesson, groups.name as group 
-# FROM courses 
-# 	JOIN groups ON courses.sp_code = groups.code 
-# 	JOIN lessons ON courses.id = lessons.courseID;

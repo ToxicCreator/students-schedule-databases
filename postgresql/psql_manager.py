@@ -82,6 +82,6 @@ class PsqlManager():
 
 
   def drop_table(self, table_name):
-    query = f'DROP TABLE IF EXISTS {table_name};'
+    query = f'DROP TABLE IF EXISTS {table_name} CASCADE;'
     self.execute_and_commit(query)
     print(f'Table "{table_name}" die.')

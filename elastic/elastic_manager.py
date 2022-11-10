@@ -5,6 +5,7 @@ from elasticsearch_dsl import Index, Q, Search
 
 # wsl -d docker-desktop
 # sysctl -w vm.max_map_count=262144
+# exit
 # docker run -d --name elastic-cnt -p 9200:9200 -e "http.cors.enabled=true" -e "http.cors.allow-origin=/.*/" elasticsearch:6.5.0
 
 
@@ -19,7 +20,6 @@ class ElasticManager():
 
   def __init__(self):
     self.__client__ = Elasticsearch('http://root:root@localhost:9200')
-    print('ElasticSearch connected successfully.')
 
 
   def create_index(self, name):

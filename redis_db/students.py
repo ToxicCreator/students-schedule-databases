@@ -43,7 +43,7 @@ class Students(Table):
 
 
   def clear(self):
-    keys = self.redis_db.keys('*')
+    keys = self.redis_db.keys()
     for key in keys:
       self.redis_db.delete(key)
 
@@ -57,3 +57,24 @@ class Students(Table):
       return self.__get_shifr()
     self.__shifrs.add(shifr)
     return shifr
+
+
+  def get_by_group(self, group_name):
+    group = []
+    keys = self.redis_db.keys()
+    for key in keys:
+      student = self.read(key)
+      if student['groupName'] == group_name:
+        group.append(key)
+    return group
+
+
+  def print_all(self):
+    keys = self.redis_db.keys('*')
+    for key in keys:
+      self.print(key)
+
+
+  def print(self, key):
+    student = self.read(key)
+    print(key, student)

@@ -21,8 +21,8 @@ class GroupsLessons(Table):
     query = f'''
       CREATE TABLE IF NOT EXISTS {self.TABLE_NAME} (
         id SERIAL PRIMARY KEY NOT NULL,
-        groupName VARCHAR(10) NOT NULL,
-        lessonID int NOT NULL
+        group_name VARCHAR(10) NOT NULL,
+        lesson_id int NOT NULL
       );
     '''
     self.psql.execute_and_commit(query)
@@ -31,22 +31,31 @@ class GroupsLessons(Table):
   def insert(self, group_name, lesson_id):
     try:
       self.psql.insert(self.TABLE_NAME, {
-        'groupName': group_name,
-        'lessonID': lesson_id
+        'group_name': group_name,
+        'lesson_id': lesson_id
       })
       return True
     except:
       return False
 
 
-  def read(self, name):
+  def read(self, id):
     query = f'''
       SELECT * FROM {self.TABLE_NAME} 
-      WHERE name = {name}
+      WHERE id = '{id}'
     '''
     self.psql.execute_and_commit(query)
     return self.psql.cursor.fetchall()
 
 
   def clear(self):
-    self.psql.clear_table(self.TABLE_NAME)
+    self.psql.drop_table(self.TABLE_NAME)
+
+
+  def get_lessons(self, group_name):
+    query = f'''
+      SELECT lesson_id FROM {self.TABLE_NAME} 
+      WHERE group_name = '{group_name}'
+    '''
+    self.psql.execute_and_commit(query)
+    return self.psql.cursor.fetchall()

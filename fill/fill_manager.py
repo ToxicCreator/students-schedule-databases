@@ -23,13 +23,12 @@ def fill():
   Faker.seed(0)
   specialities_codes = __fill_institutes()
 
-  courses_id = __fill_courses(specialities_codes, min_duration=10)
+  courses_id = __fill_courses(specialities_codes, min_duration=2, max_duration=4)
   groups_names = __fill_groups(specialities_codes)
-  lessons_id = __fill_lessons(courses_id)
-  groups_lessons = __fill_groups_lessons(groups_names, lessons_id)
+  __fill_lessons(courses_id)
   
-  groups_students = __fill_students(groups_names, min=2, max=5)
-  __fill_visits(groups_lessons, groups_students)
+  __fill_students(groups_names, min=2, max=5)
+  __fill_visits(groups_names)
 
 
 def __fill_institutes():
@@ -39,7 +38,7 @@ def __fill_institutes():
 
 
 def __fill_courses(specialities_codes, min_duration=2, max_duration=120) -> list:
-  assert min_duration / 2 > 1
+  assert min_duration / 2 >= 1
   assert max_duration >= min_duration and max_duration / 2 > 1
   courses_id = []
   courses = Courses(clear=True)
@@ -71,36 +70,22 @@ def __fill_groups(specialities_codes):
 
 
 def __fill_lessons(courses_id: list):
-  lessons_id = []
   lessons = Lessons(clear=True)
-  courses = Courses()
   descriptions = Descriptions(clear=True)
+  groups_lessons = GroupsLessons(clear=True)
+  courses = Courses()
   for course_id in courses_id:
     duration = courses.get_duration(course_id)
     lesson_count = int(duration / 2)
-    for lesson_number in range(1, lesson_count):
-      type = random.choice(TYPES)
-      lesson_date = get_lesson_date(lesson_number, lesson_count)
-      lesson_id = lessons.insert(type, lesson_date, course_id)
-      lessons_id.append(lesson_id)
-      descriptions.insert(type, 'Описание', '', lesson_id)
-  return lessons_id
+    groups = courses.get_groups(course_id)
+    for group in groups:
+      for lesson_number in range(1, lesson_count):
+        type = random.choice(TYPES)
+        lesson_date = get_lesson_date(lesson_number, lesson_count)
+        lesson_id = lessons.insert(type, lesson_date, course_id)
 
-
-def __fill_groups_lessons(groups_names, lessons_id):
-  groups_lessons = GroupsLessons(clear=True)
-  courses = Courses()
-  lessons = Lessons()
-  groups_lessons_map = {}
-  for group_name in groups_names:
-    groups_lessons_map[group_name] = []
-    courses_id = courses.get_courses_by_group(group_name)
-    lesson_course_id = lessons.read(lesson_id)[2]
-    for lesson_id in lessons_id:
-      if check_chance(70):
-        groups_lessons.insert(group_name, lesson_id)
-        groups_lessons_map[group_name].append(lesson_id)
-  return groups_lessons_map
+        descriptions.insert(type, 'Описание', '', lesson_id)
+        groups_lessons.insert(group[0], lesson_id)
 
 
 def __fill_students(groups_names, min=10, max=30):
@@ -116,10 +101,12 @@ def __fill_students(groups_names, min=10, max=30):
   return groups_students
 
 
-def __fill_visits(groups_lessons, groups_students):
+def __fill_visits(groups_names):
   visits = Visits(clear=True)
-  for group_name in groups_lessons.keys():
-    for lesson_id in groups_lessons[group_name]:
-      for student_id in groups_students[group_name]:
+  students = Students()
+  groups_lessons = GroupsLessons()
+  for group_name in groups_names:
+    for lesson in groups_lessons.get_lessons(group_name):
+      for student_id in students.get_by_group(group_name):
         visited = check_chance(50)
-        visits.insert(lesson_id, student_id, visited)
+        visits.insert(lesson[0], student_id, visited)

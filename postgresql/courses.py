@@ -59,7 +59,7 @@ class Courses(Table):
 
 
   def clear(self):
-    self.psql.clear_table(self.TABLE_NAME)
+    self.psql.drop_table(self.TABLE_NAME)
 
 
   def get_duration(self, id):
@@ -72,6 +72,18 @@ class Courses(Table):
       JOIN groups 
         ON {self.TABLE_NAME}.sp_code = groups.code 
       WHERE groups.name = '{group_name}';
+    '''
+    self.psql.execute_and_commit(query)
+    return self.psql.cursor.fetchall()
+
+
+  def get_groups(self, course_id):
+    query = f'''
+      SELECT groups.name as group 
+      FROM courses 
+        JOIN groups ON courses.sp_code = groups.code
+      WHERE courses.id = {course_id}
+      GROUP BY groups.name;
     '''
     self.psql.execute_and_commit(query)
     return self.psql.cursor.fetchall()

@@ -48,4 +48,4 @@ class Visits(Table):
 
 
   def clear(self):
-    self.psql.clear_table(self.TABLE_NAME)
+    self.psql.drop_table(self.TABLE_NAME)
