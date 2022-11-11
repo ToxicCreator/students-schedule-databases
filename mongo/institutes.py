@@ -6,6 +6,7 @@ sys.path.append(parentdir)
 
 from table import Table
 from mongo.mongo_manager import MongoManager
+from neo4j_db.graph import Graph
 from utils import parse_data
 
 
@@ -15,16 +16,28 @@ collection_name = 'institutes'
 class Institutes():
   def __init__(self, clear=False):
     self.mongo = MongoManager(database_name)
+    self.graph = Graph()
     if clear: self.mongo.remove_collection(collection_name)
     self.collection = self.mongo.collection(collection_name)
 
 
-  def fill(self):
-    institutes = parse_data('mongo\institutes.json')
+  def fill(self, path):
+    institutes = parse_data(path)
+    
+    for institute in institutes:
+      self.graph.create_institute_node(institute['name'])
+      for department in institute['departments']:
+        self.graph.create_department_node(department['name'], institute['name'])
+        for speciality in department['specialities']:
+          code = speciality['code']
+          name = speciality['name']
+          self.graph.create_speciality_node(code, name, department['name'])
+    
     if isinstance(institutes, list):
       self.collection.insert_many(institutes)
     else:
       self.collection.insert_one(institutes)
+
     
     # courses = self.__parse_data('mongo\courses.json')
     # cut = random.randint(1, len(courses))

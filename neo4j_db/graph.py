@@ -12,9 +12,46 @@ class Graph():
     self.client = Neo4jManager()
 
 
+  def create_institute_node(self, name):
+    return self.client.create_node('institute', {
+      'name': name
+    })
+
+
+  def create_department_node(self, name, institute_name):
+    query = f'''
+      MATCH (i:institute {{name: '{institute_name}'}})
+      CREATE (d:department)-[:in]->(i)
+      SET d = $params
+      RETURN d;
+    '''
+    return self.client.execute(query, {
+      'name': name
+    }).single()
+
+
+  def create_speciality_node(self, code, name, department_name):
+    query = f'''
+      MATCH (d:department {{name: '{department_name}'}})
+      CREATE (s:speciality)-[:in]->(d)
+      SET s = $params
+      RETURN s;
+    '''
+    return self.client.execute(query, {
+      'code': code,
+      'name': name
+    }).single()
+
+
   def create_course_node(self, id, values):
     values['id'] = id
-    return self.client.create_node('course', values)
+    query = f'''
+      MATCH (s:speciality {{code: '{}'}})
+      CREATE (c:course)-[:in]->(s)
+      SET c = $params
+      RETURN c;
+    '''
+    return self.client.execute(query, values).single()
 
 
   def create_lesson_node(self, id, course_id, values):

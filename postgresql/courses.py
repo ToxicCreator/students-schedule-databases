@@ -24,17 +24,15 @@ class Courses(Table):
       CREATE TABLE IF NOT EXISTS {self.TABLE_NAME} (
         id SERIAL PRIMARY KEY NOT NULL,
         name VARCHAR(120) NOT NULL,
-        sp_code VARCHAR(8) NOT NULL,
         duration int NOT NULL
       );
     '''
     self.psql.execute_and_commit(query)
 
 
-  def insert(self, name, sp_code, duration):
+  def insert(self, name, duration):
     values = {
       'name': name,
-      'sp_code': sp_code,
       'duration': duration
     }
     id = self.psql.insert(self.TABLE_NAME, values)[0]
