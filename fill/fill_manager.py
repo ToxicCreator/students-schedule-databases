@@ -1,3 +1,9 @@
+import os
+import sys
+currentdir = os.path.dirname(os.path.realpath(__file__))
+parentdir = os.path.dirname(currentdir)
+sys.path.append(parentdir)
+
 import random
 from faker import Faker
 
@@ -92,7 +98,8 @@ def __fill_lessons(courses_id: list):
 
 
 def __fill_students(groups_names, min=10, max=30):
-    students = Students(clear=True)
+    settings = parse_data('../settings.py')
+    students = Students(settings["host"], settings["redis"]["port"], clear=True)
     fake = Faker()
     groups_students = {}
     for group_name in groups_names:

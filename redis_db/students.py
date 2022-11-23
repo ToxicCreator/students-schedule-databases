@@ -12,10 +12,10 @@ from neo4j_db.graph import Graph
 class Students(Table):
     __shifrs = set()
 
-    def __init__(self, clear=False):
+    def __init__(self, host, port, clear=False):
         self.redis_db = redis.Redis(
-            host='localhost',
-            port=6379,
+            host=host,
+            port=port,
             db=0,
             charset='UTF-8',
             decode_responses=True
