@@ -19,13 +19,13 @@ class Groups(Table):
             self.clear()
         self.create_table()
 
-    def create_table(self):
+    def create_table(self) -> None:
         query = f'''
-      CREATE TABLE IF NOT EXISTS {self.TABLE_NAME} (
-        name VARCHAR(10) PRIMARY KEY NOT NULL,
-        code VARCHAR(8) NOT NULL
-      );
-    '''
+            CREATE TABLE IF NOT EXISTS {self.TABLE_NAME} (
+                name VARCHAR(10) PRIMARY KEY NOT NULL,
+                code VARCHAR(8) NOT NULL
+            );
+        '''
         self.psql.execute_and_commit(query)
 
     def insert(self, name, code):
@@ -38,16 +38,16 @@ class Groups(Table):
             return name
         return False
 
-    def read(self, name):
+    def read(self, name) -> tuple:
         query = f'''
-      SELECT * FROM {self.TABLE_NAME} 
-      WHERE name = {name}
-    '''
+            SELECT * FROM {self.TABLE_NAME} 
+            WHERE name = {name}
+        '''
         self.psql.execute_and_commit(query)
         return self.psql.cursor.fetchone()
 
-    def clear(self):
+    def clear(self) -> None:
         self.psql.drop_table(self.TABLE_NAME)
 
-    def get_speciality(self, group_id):
+    def get_speciality(self, group_id) -> tuple:
         return self.read(group_id)[1]

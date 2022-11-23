@@ -1,6 +1,7 @@
+import os
+import sys
 import random
 from faker import Faker
-
 from neo4j_db.graph import Graph
 from mongo.institutes import Institutes
 from postgresql.courses import Courses
@@ -13,12 +14,16 @@ from postgresql.visits import Visits
 
 from utils import parse_data, check_chance, generate_group_name, get_lesson_date
 
+currentdir = os.path.dirname(os.path.realpath(__file__))
+parentdir = os.path.dirname(currentdir)
+sys.path.append(parentdir)
 
 TYPES = [
-  'Лекция',
-  'Практика',
-  'Лабараторная'
+    'Лекция',
+    'Практика',
+    'Лабораторная'
 ]
+
 
 def fill():
     Faker.seed(0)
@@ -27,29 +32,29 @@ def fill():
 
     specialities_codes = __fill_institutes()
 
-    courses_id = __fill_courses(specialities_codes, min_duration=2, max_duration=4)
+    courses_id = __fill_courses(specialities_codes, min_duration = 2, max_duration = 4)
     groups_names = __fill_groups(specialities_codes)
     __fill_lessons(courses_id)
-    __fill_students(groups_names, min=2, max=5)
+    __fill_students(groups_names, min = 2, max = 5)
     __fill_visits(groups_names)
 
 
 def __fill_institutes():
-    institutes = Institutes(clear=True)
+    institutes = Institutes(clear = True)
     institutes.fill()
     return institutes.get_specialities_codes()
 
 
-def __fill_courses(specialities_codes, min_duration=2, max_duration=120) -> list:
+def __fill_courses(specialities_codes, min_duration = 2, max_duration = 120) -> list:
     assert min_duration / 2 >= 1
     assert max_duration >= min_duration and max_duration / 2 > 1
     courses_id = []
-    courses = Courses(clear=True)
-    data = parse_data('fill\courses.json')
+    courses = Courses(clear = True)
+    data = parse_data('fill/courses.json')
     for i in range(len(specialities_codes)):
         code = specialities_codes[i]
         count = random.randint(1, len(data))
-        cut_courses = random.choices(data, k=count)
+        cut_courses = random.choices(data, k = count)
         for course in cut_courses:
             duration = 2 * random.randint(min_duration / 2, max_duration / 2)
             courses_id.append(courses.insert(course['name'], code, duration))
@@ -58,7 +63,7 @@ def __fill_courses(specialities_codes, min_duration=2, max_duration=120) -> list
 
 def __fill_groups(specialities_codes):
     groups_names = set()
-    groups = Groups(clear=True)
+    groups = Groups(clear = True)
     for i in range(len(specialities_codes)):
         code = specialities_codes[i]
         for group_number in range(1, random.randint(1, 4)):
@@ -73,9 +78,9 @@ def __fill_groups(specialities_codes):
 
 
 def __fill_lessons(courses_id: list):
-    lessons = Lessons(clear=True)
-    descriptions = Descriptions(clear=True)
-    groups_lessons = GroupsLessons(clear=True)
+    lessons = Lessons(clear = True)
+    descriptions = Descriptions(clear = True)
+    groups_lessons = GroupsLessons(clear = True)
     courses = Courses()
     for course_id in courses_id:
         duration = courses.get_duration(course_id)
@@ -91,8 +96,9 @@ def __fill_lessons(courses_id: list):
             groups_lessons.insert(group[0], lesson_id)
 
 
-def __fill_students(groups_names, min=10, max=30):
-    students = Students(clear=True)
+def __fill_students(groups_names, min = 10, max = 30):
+    settings = parse_data('../settings.py')
+    students = Students(settings["host"], settings["redis"]["port"], clear = True)
     fake = Faker()
     groups_students = {}
     for group_name in groups_names:
@@ -105,7 +111,7 @@ def __fill_students(groups_names, min=10, max=30):
 
 
 def __fill_visits(groups_names):
-    visits = Visits(clear=True)
+    visits = Visits(clear = True)
     students = Students()
     groups_lessons = GroupsLessons()
     for group_name in groups_names:

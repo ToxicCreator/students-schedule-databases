@@ -2,8 +2,8 @@ from fill.fill_manager import fill
 
 
 def main():
-  fill()
+    fill()
 
 
 if __name__ == "__main__":
-  main()
+    main()
