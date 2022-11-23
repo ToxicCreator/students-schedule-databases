@@ -24,14 +24,14 @@ class Institutes():
   def fill(self, path):
     institutes = parse_data(path)
     
-    for institute in institutes:
-      self.graph.create_institute_node(institute['name'])
-      for department in institute['departments']:
-        self.graph.create_department_node(department['name'], institute['name'])
-        for speciality in department['specialities']:
-          code = speciality['code']
-          name = speciality['name']
-          self.graph.create_speciality_node(code, name, department['name'])
+    # for institute in institutes:
+    #   self.graph.create_institute_node(institute['name'])
+    #   for department in institute['departments']:
+    #     self.graph.create_department_node(department['name'], institute['name'])
+    #     for speciality in department['specialities']:
+    #       code = speciality['code']
+    #       name = speciality['name']
+    #       self.graph.create_speciality_node(code, name, department['name'])
     
     if isinstance(institutes, list):
       self.collection.insert_many(institutes)
