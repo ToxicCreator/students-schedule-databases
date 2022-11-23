@@ -25,12 +25,12 @@ class PsqlManager(metaclass = MetaSingleton):
 
     def check_table_exist(self, table_name):
         query = f'''
-      SELECT table_name 
-      FROM information_schema.tables 
-      WHERE table_name = '{table_name}' 
-      AND table_schema 
-      NOT IN ('information_schema','pg_catalog');
-    '''
+            SELECT table_name 
+            FROM information_schema.tables 
+            WHERE table_name = '{table_name}' 
+            AND table_schema 
+            NOT IN ('information_schema','pg_catalog');
+        '''
         self.execute_and_commit(query)
         return not (self.cursor.rowcount == 0)
 

@@ -24,13 +24,13 @@ class Lessons(Table):
 
     def create_table(self):
         query = f'''
-      CREATE TABLE IF NOT EXISTS {self.TABLE_NAME} (
-        id SERIAL PRIMARY KEY NOT NULL,
-        type VARCHAR(40) NOT NULL,
-        lesson_date TIMESTAMP NOT NULL,
-        course_id SMALLINT NOT NULL
-      );
-    '''
+            CREATE TABLE IF NOT EXISTS {self.TABLE_NAME} (
+                id SERIAL PRIMARY KEY NOT NULL,
+                type VARCHAR(40) NOT NULL,
+                lesson_date TIMESTAMP NOT NULL,
+                course_id SMALLINT NOT NULL
+            );
+        '''
         self.psql.execute_and_commit(query)
 
     def create_partition(self):
@@ -41,38 +41,38 @@ class Lessons(Table):
             if self.psql.check_table_exist(part_name):
                 continue
             query = f'''
-        CREATE TABLE IF NOT EXISTS {part_name} (
-          CHECK (date_part('week', lesson_date) = {week_number})
-        ) INHERITS ({self.TABLE_NAME});
-      '''
+                CREATE TABLE IF NOT EXISTS {part_name} (
+                    CHECK (date_part('week', lesson_date) = {week_number})
+                ) INHERITS ({self.TABLE_NAME});
+            '''
             self.psql.execute_and_commit(query)
         self.create_partition_trigger()
 
     def create_partition_trigger(self):
         trigger_name = 'insertPartition'
         trigger = f'''
-      CREATE OR REPLACE FUNCTION {trigger_name}()
-        RETURNS TRIGGER AS
-      $$
-      DECLARE
-        partition_name TEXT;
-      BEGIN
-        partition_name := format(
-          '{self.TABLE_NAME}%s', 
-          date_part('week', NEW.lesson_date)::integer
-        );
-        execute 'INSERT INTO ' || partition_name || ' VALUES (($1).*)' USING NEW;
-        RETURN null;
-      END;
-      $$
-      LANGUAGE 'plpgsql';
-    '''
+            CREATE OR REPLACE FUNCTION {trigger_name}()
+                RETURNS TRIGGER AS
+            $$
+            DECLARE
+                partition_name TEXT;
+            BEGIN
+                partition_name := format(
+                    '{self.TABLE_NAME}%s', 
+                    date_part('week', NEW.lesson_date)::integer
+                );
+                execute 'INSERT INTO ' || partition_name || ' VALUES (($1).*)' USING NEW;
+                RETURN null;
+            END;
+            $$
+            LANGUAGE 'plpgsql';
+        '''
         self.psql.execute_and_commit(trigger)
         query = f'''
-      CREATE OR REPLACE TRIGGER partitionInsert 
-      BEFORE INSERT ON {self.TABLE_NAME} 
-      FOR EACH ROW EXECUTE PROCEDURE {trigger_name}();
-    '''
+            CREATE OR REPLACE TRIGGER partitionInsert 
+            BEFORE INSERT ON {self.TABLE_NAME} 
+            FOR EACH ROW EXECUTE PROCEDURE {trigger_name}();
+        '''
         self.psql.execute_and_commit(query)
 
     def insert(self, lesson_type, lesson_date, course_id):
@@ -87,9 +87,9 @@ class Lessons(Table):
 
     def read(self, lesson_id):
         query = f'''
-      SELECT * FROM {self.TABLE_NAME} 
-      WHERE id = {lesson_id}
-    '''
+            SELECT * FROM {self.TABLE_NAME} 
+            WHERE id = {lesson_id}
+        '''
         self.psql.execute_and_commit(query)
         return self.psql.cursor.fetchone()
 
@@ -103,26 +103,26 @@ class Lessons(Table):
 
     def update_type(self, lesson_id, lesson_type):
         query = f'''
-      UPDATE {self.TABLE_NAME} set
-        type = '{lesson_type}'
-      WHERE id = {lesson_id}
-    '''
+            UPDATE {self.TABLE_NAME} set
+                type = '{lesson_type}'
+            WHERE id = {lesson_id}
+        '''
         self.psql.execute_and_commit(query)
 
     def update_date(self, lesson_id, date):
         query = f'''
-      UPDATE {self.TABLE_NAME} set
-        lesson_date = '{date}'
-      WHERE id = {lesson_id}
-    '''
+            UPDATE {self.TABLE_NAME} set
+                lesson_date = '{date}'
+            WHERE id = {lesson_id}
+        '''
         self.psql.execute_and_commit(query)
 
     def update_name(self, lesson_id, name):
         query = f'''
-      UPDATE {self.TABLE_NAME} set
-        name = '{name}'
-      WHERE id = {lesson_id}
-    '''
+            UPDATE {self.TABLE_NAME} set
+                name = '{name}'
+            WHERE id = {lesson_id}
+        '''
         self.psql.execute_and_commit(query)
 
     def clear(self):

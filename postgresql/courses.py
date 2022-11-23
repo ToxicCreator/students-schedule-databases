@@ -21,12 +21,12 @@ class Courses(Table):
 
     def create_table(self):
         query = f'''
-      CREATE TABLE IF NOT EXISTS {self.TABLE_NAME} (
-        id SERIAL PRIMARY KEY NOT NULL,
-        name VARCHAR(120) NOT NULL,
-        duration int NOT NULL
-      );
-    '''
+            CREATE TABLE IF NOT EXISTS {self.TABLE_NAME} (
+                id SERIAL PRIMARY KEY NOT NULL,
+                name VARCHAR(120) NOT NULL,
+                duration int NOT NULL
+            );
+        '''
         self.psql.execute_and_commit(query)
 
     def insert(self, name, duration):
@@ -50,9 +50,9 @@ class Courses(Table):
 
     def read(self, course_id):
         query = f'''
-      SELECT * FROM {self.TABLE_NAME} 
-      WHERE id = {course_id}
-    '''
+        SELECT * FROM {self.TABLE_NAME} 
+        WHERE id = {course_id}
+        '''
         self.psql.execute_and_commit(query)
         return self.psql.cursor.fetchall()
 
@@ -64,21 +64,21 @@ class Courses(Table):
 
     def get_courses_by_group(self, group_name):
         query = f'''
-      SELECT {self.TABLE_NAME}.id FROM {self.TABLE_NAME} 
-      JOIN groups 
-        ON {self.TABLE_NAME}.sp_code = groups.code 
-      WHERE groups.name = '{group_name}';
-    '''
+            SELECT {self.TABLE_NAME}.id FROM {self.TABLE_NAME} 
+            JOIN groups 
+                ON {self.TABLE_NAME}.sp_code = groups.code 
+            WHERE groups.name = '{group_name}';
+        '''
         self.psql.execute_and_commit(query)
         return self.psql.cursor.fetchall()
 
     def get_groups(self, course_id):
         query = f'''
-      SELECT groups.name as group 
-      FROM courses 
-        JOIN groups ON courses.sp_code = groups.code
-      WHERE courses.id = {course_id}
-      GROUP BY groups.name;
-    '''
+            SELECT groups.name as group 
+            FROM courses 
+                JOIN groups ON courses.sp_code = groups.code
+            WHERE courses.id = {course_id}
+            GROUP BY groups.name;
+        '''
         self.psql.execute_and_commit(query)
         return self.psql.cursor.fetchall()

@@ -15,9 +15,9 @@ from utils import parse_data, check_chance, generate_group_name, get_lesson_date
 
 
 TYPES = [
-  'Лекция',
-  'Практика',
-  'Лабараторная'
+    'Лекция',
+    'Практика',
+    'Лабараторная'
 ]
 
 def fill():
