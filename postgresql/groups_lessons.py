@@ -1,5 +1,8 @@
 import os
 import sys
+
+from typing import List
+
 from table import Table
 from postgresql.psql_manager import PsqlManager
 
@@ -37,7 +40,7 @@ class GroupsLessons(Table):
         except (Exception,):
             return False
 
-    def read(self, groups_lessons_id):
+    def read(self, groups_lessons_id) -> List[tuple]:
         query = f'''
             SELECT * FROM {self.TABLE_NAME} 
             WHERE id = '{groups_lessons_id}'
@@ -48,7 +51,7 @@ class GroupsLessons(Table):
     def clear(self):
         self.psql.drop_table(self.TABLE_NAME)
 
-    def get_lessons(self, group_name):
+    def get_lessons(self, group_name) -> List[tuple]:
         query = f'''
             SELECT lesson_id FROM {self.TABLE_NAME} 
             WHERE group_name = '{group_name}'

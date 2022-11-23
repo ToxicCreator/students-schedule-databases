@@ -22,7 +22,7 @@ class Lessons(Table):
         self.create_table()
         self.create_partition()
 
-    def create_table(self):
+    def create_table(self) -> None:
         query = f'''
             CREATE TABLE IF NOT EXISTS {self.TABLE_NAME} (
                 id SERIAL PRIMARY KEY NOT NULL,
@@ -33,7 +33,7 @@ class Lessons(Table):
         '''
         self.psql.execute_and_commit(query)
 
-    def create_partition(self):
+    def create_partition(self) -> None:
         for week_number in range(1, week_count):
             part_name = f'{self.TABLE_NAME}{week_number}'
             if week_number == 43:
@@ -48,7 +48,7 @@ class Lessons(Table):
             self.psql.execute_and_commit(query)
         self.create_partition_trigger()
 
-    def create_partition_trigger(self):
+    def create_partition_trigger(self) -> None:
         trigger_name = 'insertPartition'
         trigger = f'''
             CREATE OR REPLACE FUNCTION {trigger_name}()
@@ -83,9 +83,9 @@ class Lessons(Table):
         }
         lesson_id = self.psql.insert(self.TABLE_NAME, values)[0]
         self.graph.create_lesson_node(lesson_id, course_id, values)
-        return id
+        return lesson_id
 
-    def read(self, lesson_id):
+    def read(self, lesson_id) -> tuple:
         query = f'''
             SELECT * FROM {self.TABLE_NAME} 
             WHERE id = {lesson_id}
@@ -93,15 +93,15 @@ class Lessons(Table):
         self.psql.execute_and_commit(query)
         return self.psql.cursor.fetchone()
 
-    def update(self, lesson_id, lesson_type = False, date = False, name = False):
-        if type:
+    def update(self, lesson_id, lesson_type = False, date = False, name = False) -> None:
+        if lesson_type:
             self.update_type(lesson_id, lesson_type)
         if date:
             self.update_date(lesson_id, date)
         if name:
             self.update_name(lesson_id, name)
 
-    def update_type(self, lesson_id, lesson_type):
+    def update_type(self, lesson_id, lesson_type) -> None:
         query = f'''
             UPDATE {self.TABLE_NAME} set
                 type = '{lesson_type}'
@@ -109,7 +109,7 @@ class Lessons(Table):
         '''
         self.psql.execute_and_commit(query)
 
-    def update_date(self, lesson_id, date):
+    def update_date(self, lesson_id, date) -> None:
         query = f'''
             UPDATE {self.TABLE_NAME} set
                 lesson_date = '{date}'
@@ -117,7 +117,7 @@ class Lessons(Table):
         '''
         self.psql.execute_and_commit(query)
 
-    def update_name(self, lesson_id, name):
+    def update_name(self, lesson_id, name) -> None:
         query = f'''
             UPDATE {self.TABLE_NAME} set
                 name = '{name}'
@@ -125,8 +125,8 @@ class Lessons(Table):
         '''
         self.psql.execute_and_commit(query)
 
-    def clear(self):
+    def clear(self) -> None:
         self.psql.drop_table(self.TABLE_NAME)
 
-    def get_course(self, course_id):
+    def get_course(self, course_id) -> tuple:
         return self.read(course_id)[3]

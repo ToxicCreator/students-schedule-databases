@@ -1,5 +1,8 @@
 import os
 import sys
+
+from typing import List
+
 from table import Table
 from postgresql.psql_manager import PsqlManager
 from neo4j_db.graph import Graph
@@ -19,7 +22,7 @@ class Courses(Table):
             self.clear()
         self.create_table()
 
-    def create_table(self):
+    def create_table(self) -> None:
         query = f'''
             CREATE TABLE IF NOT EXISTS {self.TABLE_NAME} (
                 id SERIAL PRIMARY KEY NOT NULL,
@@ -48,7 +51,7 @@ class Courses(Table):
     #   self.psql.execute_and_commit(query)
     #   return self.psql.cursor.fetchall()
 
-    def read(self, course_id):
+    def read(self, course_id) -> List[tuple]:
         query = f'''
         SELECT * FROM {self.TABLE_NAME} 
         WHERE id = {course_id}
@@ -56,13 +59,13 @@ class Courses(Table):
         self.psql.execute_and_commit(query)
         return self.psql.cursor.fetchall()
 
-    def clear(self):
+    def clear(self) -> None:
         self.psql.drop_table(self.TABLE_NAME)
 
-    def get_duration(self, course_id):
+    def get_duration(self, course_id) -> List[tuple]:
         return self.read(course_id)[0][3]
 
-    def get_courses_by_group(self, group_name):
+    def get_courses_by_group(self, group_name) -> List[tuple]:
         query = f'''
             SELECT {self.TABLE_NAME}.id FROM {self.TABLE_NAME} 
             JOIN groups 
@@ -72,7 +75,7 @@ class Courses(Table):
         self.psql.execute_and_commit(query)
         return self.psql.cursor.fetchall()
 
-    def get_groups(self, course_id):
+    def get_groups(self, course_id) -> List[tuple]:
         query = f'''
             SELECT groups.name as group 
             FROM courses 
