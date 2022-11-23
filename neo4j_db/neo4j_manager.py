@@ -2,16 +2,16 @@ from neo4j import GraphDatabase
 
 
 class Neo4jManager():
-  def __new__(self):
+  def __new__(self, host, port, login, password):
     if not hasattr(self, 'instance'):
       self.instance = super(Neo4jManager, self).__new__(self)
     return self.instance
 
 
-  def __init__(self):
+  def __init__(self, host, port, login, password):
     self.database = GraphDatabase.driver(
-      uri="bolt://localhost:7687",
-      auth=('neo4j', 'admin')
+      uri="bolt://{0}:{1}".format(host, port),
+      auth=(login, password)
     )
     self.session = self.database.session()
     # try:

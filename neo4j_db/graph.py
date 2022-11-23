@@ -5,11 +5,14 @@ parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
 
 from neo4j_db.neo4j_manager import Neo4jManager
+from utils import parse_data
 
 
 class Graph():
   def __init__(self):
-    self.client = Neo4jManager()
+    settings = parse_data('../settings.py')
+    self.client = Neo4jManager(settings["host"], settings["neo4j"]["port"], 
+                              settings["neo4j"]["login"], settings["neo4j"]["password"])
 
 
   def create_institute_node(self, name):

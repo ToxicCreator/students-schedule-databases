@@ -1,24 +1,22 @@
 {
   "mongodb": {
-    "host": "localhost",
-    "port": 27016
-  },
-  "redis": {
-    "host": "localhost",
     "port": 27015
   },
+  "redis": {
+    "port": 27016
+  },
   "postgresql": {
-    "host": "localhost",
-    "port": 27019
+    "port": 27017,
+    "login": "postgres",
+    "password": "password"
   },
   "neo4j": {
-    "host": "172.17.0.4",
-    "port": 7687,
+    "port": 27018,
     "login": "neo4j",
-    "passw": "zx3021"
+    "passw": "password"
   },
   "elasticsearch": {
-    "host": "localhost",
-    "port": 27018
-  }
+    "port": 27019
+  },
+  "host": "localhost"
 }

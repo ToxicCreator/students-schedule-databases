@@ -15,7 +15,8 @@ collection_name = 'institutes'
 
 class Institutes():
   def __init__(self, clear=False):
-    self.mongo = MongoManager(database_name)
+    settings = parse_data('../settings.json')
+    self.mongo = MongoManager(settings["host"], settings["mongo"]["port"], database_name)
     self.graph = Graph()
     if clear: self.mongo.remove_collection(collection_name)
     self.collection = self.mongo.collection(collection_name)

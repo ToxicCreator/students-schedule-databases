@@ -2,14 +2,14 @@ from pymongo import MongoClient;
 
 # docker run -d --name mongo-cnt -p 27017:27017 mongo
 class MongoManager():
-  def __new__(self, db_name):
+  def __new__(self, host, port, db_name):
     if not hasattr(self, 'instance'):
       self.instance = super(MongoManager, self).__new__(self)
     return self.instance
 
 
-  def __init__(self, db_name):
-    client = MongoClient("mongodb://localhost:27017/")
+  def __init__(self, host, port, db_name):
+    client = MongoClient(host = host, port = port)
     self.db = client[db_name]
 
 
