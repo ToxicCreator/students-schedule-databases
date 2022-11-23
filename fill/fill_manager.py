@@ -18,12 +18,6 @@ currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
 
-TYPES = [
-    'Лекция',
-    'Практика',
-    'Лабораторная'
-]
-
 
 def fill():
     Faker.seed(0)
@@ -83,14 +77,16 @@ def __fill_lessons(courses_id: list):
     groups_lessons = GroupsLessons(clear = True)
     courses = Courses()
     for course_id in courses_id:
-        duration = courses.get_duration(course_id)
-        lesson_count = int(duration / 2)
+        # duration = courses.get_duration(course_id)
+        # lesson_count = int(duration / 2)
+        lesson_count = 10
         groups = courses.get_groups(course_id)
         for group in groups:
             for lesson_number in range(1, lesson_count + 1):
-                type = random.choice(TYPES)
+                # TODO: перенести в Schedule
                 lesson_date = get_lesson_date(lesson_number, lesson_count)
-                lesson_id = lessons.insert(type, lesson_date, course_id)
+                # TODO: получить id описания из elastic
+                lesson_id = lessons.insert(description_id, course_id)
 
             descriptions.insert(type, 'Описание', '', lesson_id)
             groups_lessons.insert(group[0], lesson_id)

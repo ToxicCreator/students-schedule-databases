@@ -11,8 +11,12 @@ sys.path.append(parentdir)
 class Graph:
     def __init__(self):
         settings = parse_data('../settings.py')
-        self.client = Neo4jManager(settings["host"], settings["neo4j"]["port"],
-                                   settings["neo4j"]["login"], settings["neo4j"]["password"])
+        self.client = Neo4jManager(
+            settings["host"], 
+            settings["neo4j"]["port"],
+            settings["neo4j"]["login"], 
+            settings["neo4j"]["password"]
+        )
 
     def create_institute_node(self, name):
         return self.client.create_node('institute', {
