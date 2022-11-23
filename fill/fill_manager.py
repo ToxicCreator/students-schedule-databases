@@ -1,6 +1,10 @@
 import random
 from faker import Faker
-
+import os
+import sys
+currentdir = os.path.dirname(os.path.realpath(__file__))
+parentdir = os.path.dirname(currentdir)
+sys.path.append(parentdir)
 from neo4j_db.graph import Graph
 from mongo.institutes import Institutes
 from postgresql.courses import Courses
@@ -25,16 +29,14 @@ TYPES = [
 
 def fill():
     Faker.seed(0)
-    graph = Graph()
-    graph.clear()
-
-    specialities_codes = __fill_institutes()
-
-    courses_id = __fill_courses(specialities_codes, min_duration=2, max_duration=4)
-    groups_names = __fill_groups(specialities_codes)
-    __fill_lessons(courses_id)
-    __fill_students(groups_names, min=2, max=5)
-    __fill_visits(groups_names)
+    # graph = Graph()
+    # graph.clear()
+    # specialities_codes = __fill_institutes()
+    # courses_id = __fill_courses(specialities_codes, min_duration=2, max_duration=4)
+    # groups_names = __fill_groups(specialities_codes)
+    # __fill_lessons(courses_id)
+    __fill_students(groups_names=group_names, min=10, max=20)
+    # __fill_visits(groups_names)
 
 
 def __fill_institutes():
