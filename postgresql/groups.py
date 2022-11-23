@@ -21,11 +21,11 @@ class Groups(Table):
 
     def create_table(self):
         query = f'''
-      CREATE TABLE IF NOT EXISTS {self.TABLE_NAME} (
-        name VARCHAR(10) PRIMARY KEY NOT NULL,
-        code VARCHAR(8) NOT NULL
-      );
-    '''
+            CREATE TABLE IF NOT EXISTS {self.TABLE_NAME} (
+                name VARCHAR(10) PRIMARY KEY NOT NULL,
+                code VARCHAR(8) NOT NULL
+            );
+        '''
         self.psql.execute_and_commit(query)
 
     def insert(self, name, code):
@@ -40,9 +40,9 @@ class Groups(Table):
 
     def read(self, name):
         query = f'''
-      SELECT * FROM {self.TABLE_NAME} 
-      WHERE name = {name}
-    '''
+            SELECT * FROM {self.TABLE_NAME} 
+            WHERE name = {name}
+        '''
         self.psql.execute_and_commit(query)
         return self.psql.cursor.fetchone()
 

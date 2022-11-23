@@ -14,11 +14,11 @@ class Students(Table):
 
     def __init__(self, host, port, clear=False):
         self.redis_db = redis.Redis(
-          host=host,
-          port=port,
-          db=0,
-          charset='UTF-8',
-          decode_responses=True
+            host=host,
+            port=port,
+            db=0,
+            charset='UTF-8',
+            decode_responses=True
         )
         self.graph = Graph()
         if clear:

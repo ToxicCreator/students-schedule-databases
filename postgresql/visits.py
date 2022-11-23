@@ -21,12 +21,12 @@ class Visits(Table):
 
     def create_table(self):
         query = f'''
-      CREATE TABLE IF NOT EXISTS {self.TABLE_NAME} (
-        lesson INT NULL,
-        student VARCHAR(9) NOT NULL,
-        visited BOOLEAN DEFAULT false
-      );
-    '''
+            CREATE TABLE IF NOT EXISTS {self.TABLE_NAME} (
+                lesson INT NULL,
+                student VARCHAR(9) NOT NULL,
+                visited BOOLEAN DEFAULT false
+            );
+        '''
         self.psql.execute_and_commit(query)
 
     def insert(self, lesson_id, student_id, visited = False):
@@ -40,10 +40,10 @@ class Visits(Table):
 
     def read(self, studentID, lessonID):
         query = f'''
-      SELECT * FROM {self.TABLE_NAME} 
-      WHERE student = {studentID} 
-        AND lesson = {lessonID}
-    '''
+            SELECT * FROM {self.TABLE_NAME} 
+            WHERE student = {studentID} 
+            AND lesson = {lessonID}
+        '''
         self.psql.execute_and_commit(query)
         return self.psql.cursor.fetchall()
 
