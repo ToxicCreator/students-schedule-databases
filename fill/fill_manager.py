@@ -1,6 +1,10 @@
 import random
 from faker import Faker
-
+import os
+import sys
+currentdir = os.path.dirname(os.path.realpath(__file__))
+parentdir = os.path.dirname(currentdir)
+sys.path.append(parentdir)
 from neo4j_db.graph import Graph
 from mongo.institutes import Institutes
 from postgresql.courses import Courses
@@ -10,7 +14,7 @@ from elastic.descriptions import Descriptions
 from postgresql.groups_lessons import GroupsLessons
 from redis_db.students import Students
 from postgresql.visits import Visits
-
+from names import get_first_name, get_last_name
 from utils import parse_data, check_chance, generate_group_name, get_lesson_date
 
 
@@ -22,16 +26,14 @@ TYPES = [
 
 def fill():
     Faker.seed(0)
-    graph = Graph()
-    graph.clear()
-
-    specialities_codes = __fill_institutes()
-
-    courses_id = __fill_courses(specialities_codes, min_duration=2, max_duration=4)
-    groups_names = __fill_groups(specialities_codes)
-    __fill_lessons(courses_id)
-    __fill_students(groups_names, min=2, max=5)
-    __fill_visits(groups_names)
+    # graph = Graph()
+    # graph.clear()
+    # specialities_codes = __fill_institutes()
+    # courses_id = __fill_courses(specialities_codes, min_duration=2, max_duration=4)
+    # groups_names = __fill_groups(specialities_codes)
+    # __fill_lessons(courses_id)
+    __fill_students(groups_names=group_names, min=10, max=20)
+    # __fill_visits(groups_names)
 
 
 def __fill_institutes():
@@ -86,7 +88,6 @@ def __fill_lessons(courses_id: list):
                 type = random.choice(TYPES)
                 lesson_date = get_lesson_date(lesson_number, lesson_count)
                 lesson_id = lessons.insert(type, lesson_date, course_id)
-
             descriptions.insert(type, 'Описание', '', lesson_id)
             groups_lessons.insert(group[0], lesson_id)
 
@@ -99,7 +100,7 @@ def __fill_students(groups_names, min=10, max=30):
         groups_students[group_name] = []
         count = random.randint(min, max)
         for i in range(count):
-            student = students.insert(fake.name(), group_name)
+            student = students.insert(name=get_first_name(), surname=get_last_name(), group_name=group_name)
             groups_students[group_name].append(student)
     return groups_students
 

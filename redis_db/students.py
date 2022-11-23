@@ -33,11 +33,12 @@ class Students(Table):
         return self.redis_db.hgetall(key)
 
 
-    def insert(self, name, group_name):
+    def insert(self, name, surname, group_name):
         key = self.__get_shifr()
         self.redis_db.hset(key, 'name', name)
-        self.redis_db.hset(key, 'group_name', group_name)
-        self.graph.create_student_node(key, name, group_name)
+        self.redis_db.hset(key, 'surname', surname)
+        self.redis_db.hset(key, 'groupID', group_name)
+        # self.graph.create_student_node(key, name, group_name)
         return key
 
 
