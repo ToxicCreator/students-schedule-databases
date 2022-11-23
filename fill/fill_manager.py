@@ -1,12 +1,7 @@
 import os
 import sys
-currentdir = os.path.dirname(os.path.realpath(__file__))
-parentdir = os.path.dirname(currentdir)
-sys.path.append(parentdir)
-
 import random
 from faker import Faker
-
 from neo4j_db.graph import Graph
 from mongo.institutes import Institutes
 from postgresql.courses import Courses
@@ -19,10 +14,14 @@ from postgresql.visits import Visits
 
 from utils import parse_data, check_chance, generate_group_name, get_lesson_date
 
+currentdir = os.path.dirname(os.path.realpath(__file__))
+parentdir = os.path.dirname(currentdir)
+sys.path.append(parentdir)
+
 TYPES = [
     'Лекция',
     'Практика',
-    'Лабараторная'
+    'Лабораторная'
 ]
 
 
@@ -51,7 +50,7 @@ def __fill_courses(specialities_codes, min_duration = 2, max_duration = 120) -> 
     assert max_duration >= min_duration and max_duration / 2 > 1
     courses_id = []
     courses = Courses(clear = True)
-    data = parse_data('fill\courses.json')
+    data = parse_data('fill/courses.json')
     for i in range(len(specialities_codes)):
         code = specialities_codes[i]
         count = random.randint(1, len(data))
@@ -89,22 +88,17 @@ def __fill_lessons(courses_id: list):
         groups = courses.get_groups(course_id)
         for group in groups:
             for lesson_number in range(1, lesson_count + 1):
-                lesson_type = random.choice(TYPES)
+                type = random.choice(TYPES)
                 lesson_date = get_lesson_date(lesson_number, lesson_count)
-                lesson_id = lessons.insert(lesson_type, lesson_date, course_id)
+                lesson_id = lessons.insert(type, lesson_date, course_id)
 
-            descriptions.insert(lesson_type, 'Описание', '', lesson_id)
+            descriptions.insert(type, 'Описание', '', lesson_id)
             groups_lessons.insert(group[0], lesson_id)
 
 
-<<<<<<< Updated upstream
-def __fill_students(groups_names, min=10, max=30):
-    settings = parse_data('../settings.py')
-    students = Students(settings["host"], settings["redis"]["port"], clear=True)
-=======
 def __fill_students(groups_names, min = 10, max = 30):
-    students = Students(clear = True)
->>>>>>> Stashed changes
+    settings = parse_data('../settings.py')
+    students = Students(settings["host"], settings["redis"]["port"], clear = True)
     fake = Faker()
     groups_students = {}
     for group_name in groups_names:

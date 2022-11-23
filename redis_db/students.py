@@ -14,23 +14,13 @@ sys.path.append(parentdir)
 class Students(Table):
     __shifrs = set()
 
-<<<<<<< Updated upstream
-    def __init__(self, host, port, clear=False):
+    def __init__(self, host, port, clear = False):
         self.redis_db = redis.Redis(
-            host=host,
-            port=port,
-            db=0,
-            charset='UTF-8',
-            decode_responses=True
-=======
-    def __init__(self, clear = False):
-        self.redis_db = redis.Redis(
-            host = 'localhost',
-            port = 6379,
+            host = host,
+            port = port,
             db = 0,
             charset = 'UTF-8',
             decode_responses = True
->>>>>>> Stashed changes
         )
         self.graph = Graph()
         if clear:

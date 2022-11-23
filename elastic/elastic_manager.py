@@ -7,7 +7,8 @@ from singleton import MetaSingleton
 # wsl -d docker-desktop
 # sysctl -w vm.max_map_count=262144
 # exit
-# docker run -d --name elastic-cnt -p 9200:9200 -e "http.cors.enabled=true" -e "http.cors.allow-origin=/.*/" elasticsearch:6.5.0
+# docker run -d --name elastic-cnt -p 9200:9200 -e \
+# "http.cors.enabled=true" -e "http.cors.allow-origin=/.*/" elasticsearch:6.5.0
 
 
 LAG = 0.5

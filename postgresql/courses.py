@@ -1,8 +1,6 @@
 import os
 import sys
-
 from typing import List
-
 from table import Table
 from postgresql.psql_manager import PsqlManager
 from neo4j_db.graph import Graph
