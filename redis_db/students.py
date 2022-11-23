@@ -14,13 +14,13 @@ sys.path.append(parentdir)
 class Students(Table):
     __shifrs = set()
 
-    def __init__(self, host, port, clear = False):
+    def __init__(self, host, port, clear=False):
         self.redis_db = redis.Redis(
-            host = host,
-            port = port,
-            db = 0,
-            charset = 'UTF-8',
-            decode_responses = True
+            host=host,
+            port=port,
+            db=0,
+            charset='UTF-8',
+            decode_responses=True
         )
         self.graph = Graph()
         if clear:
@@ -32,11 +32,12 @@ class Students(Table):
     def read(self, key):
         return self.redis_db.hgetall(key)
 
-    def insert(self, name, group_name):
+    def insert(self, name, surname, group_name):
         key = self.__get_shifr()
         self.redis_db.hset(key, 'name', name)
-        self.redis_db.hset(key, 'group_name', group_name)
-        self.graph.create_student_node(key, name, group_name)
+        self.redis_db.hset(key, 'surname', surname)
+        self.redis_db.hset(key, 'groupID', group_name)
+        # self.graph.create_student_node(key, name, group_name)
         return key
 
     def update(self, key, new_value):
@@ -78,3 +79,4 @@ class Students(Table):
 
 if __name__ == "__main__":
     pass
+
