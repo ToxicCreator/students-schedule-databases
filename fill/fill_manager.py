@@ -37,7 +37,7 @@ def fill():
 
 def __fill_institutes():
   institutes = Institutes(clear=True)
-  institutes.fill()
+  institutes.fill("mongoInit.json")
   return institutes.get_specialities_codes()
 
 
