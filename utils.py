@@ -1,7 +1,6 @@
 from json import load
 from datetime import date
-from random import randint, choices
-
+from random import randint, choices, choice
 
 def parse_data(file_path):
     with open(file_path, encoding = 'utf-8') as file:
@@ -15,15 +14,28 @@ def check_chance(chance) -> bool:
 
 
 def generate_group_name(number) -> str:
-    letter = ['А', 'Б', 'В', 'Г', 'Д']
-    name = choices(letter, k = 4)
-    name += f'-{number}'
-    return ''.join(name)
+    letters = "БСБОКМПФРСГУДИЭХТВ"
+
+    groupCode = ''.join(choice(letters) for i in range(4))
+    groupCode += "-0"
+    groupCode += str(randint(1, 9))
+    groupCode += "-"
+    groupCode += str(randint(18, 22))
+    return groupCode
 
 
-def get_lesson_date(lesson_number, lesson_count, year = 2022):
+def get_lesson_date(
+        lesson_number, 
+        lessons_count, 
+        first_month=1, 
+        last_month=12, 
+        year=2022
+    ):
+    assert lesson_number > lessons_count
+    assert 1990 <= year <= 2022
+    assert 1 <= first_month <= 12
+    assert 1 <= last_month <= 12
     day = randint(1, 28)
-    month = lesson_number // (lesson_count / 12)
-    if month == 0:
-        month = 1
+    months_count = last_month - first_month
+    month = lesson_number // (lessons_count / months_count) + first_month
     return date(year, int(month), day)
