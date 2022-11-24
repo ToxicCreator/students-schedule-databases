@@ -23,8 +23,7 @@ sys.path.append(parentdir)
 
 TYPES = [
   'Лекция',
-  'Практика',
-  'Лабараторная'
+  'Практика'
 ]
 
 def fill():
