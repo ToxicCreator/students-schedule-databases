@@ -35,15 +35,17 @@ class Lessons(Table):
             CREATE TABLE IF NOT EXISTS {self.TABLE_NAME} (
                 id SERIAL PRIMARY KEY NOT NULL,
                 type lessType NOT NULL,
-                course_id SMALLINT NOT NULL
+                course_id SMALLINT NOT NULL,
+                description_id int NOT NULL
             );
         '''
         self.psql.execute_and_commit(query)
 
-    def insert(self, lesson_type, course_id):
+    def insert(self, lesson_type, course_id, description_id):
         values = {
             'type': lesson_type,
-            'course_id': course_id
+            'course_id': course_id,
+            'description_id': description_id
         }
         lesson_id = self.psql.insert(self.TABLE_NAME, values)[0]
         # self.graph.create_lesson_node(lesson_id, course_id, values)

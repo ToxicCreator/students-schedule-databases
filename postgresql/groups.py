@@ -57,6 +57,13 @@ class Groups(Table):
         self.psql.execute_and_commit(query)
         return self.psql.cursor.fetchall()
 
+    def read_all_ids(self):
+        query = f'''
+            SELECT name FROM {self.TABLE_NAME};
+        '''
+        self.psql.execute_and_commit(query)
+        return self.psql.cursor.fetchall()
+
     def clear(self) -> None:
         self.psql.drop_table(self.TABLE_NAME)
 
