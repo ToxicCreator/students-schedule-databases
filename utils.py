@@ -30,13 +30,15 @@ def get_lesson_date(
         months_count, 
         first_year
     ):
-    assert lesson_number > lessons_count
+    assert lesson_number <= lessons_count
     assert 1990 <= first_year <= 2022
     assert 1 <= months_count <= 45
     day = randint(1, 28)
     month_number = lesson_number // (lessons_count / (months_count - 1)) + 9
-    year = month_number // 12
+    year = int(month_number // 13) + first_year
     month = month_number % 12
+    if month == 0:
+        month = 12
     return date(year, int(month), day)
 
 

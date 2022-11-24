@@ -62,12 +62,13 @@ class Lessons(Table):
 
     def read_by_course_ids(self, course_ids):
         query = f'''
-            SELECT lesson_id FROM {self.TABLE_NAME} 
-            WHERE course_id = {' OR course_id = '.join(course_ids)}
-            GROUP BY course_id
+            SELECT id FROM {self.TABLE_NAME} 
+            WHERE course_id = {' OR course_id = '.join([str(course) for course in course_ids])} 
+            GROUP BY course_id, id
         '''
+
         self.psql.execute_and_commit(query)
-        return self.psql.cursor.fetchone()
+        return self.psql.cursor.fetchall()
 
     def update(self, lesson_id, name = False, lesson_type = False, course_id = False) -> None:
         if lesson_type:
