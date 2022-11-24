@@ -16,7 +16,7 @@ from postgresql.lessons import Lessons
 from redis_db.students import Students
 from postgresql.visits import Visits
 
-from utils import parse_data, check_chance, generate_group_name, get_lesson_date
+from utils import parse_data, check_chance, generate_group_name, get_lesson_date, get_foreign_courses
 
 TYPES = [
     'Лекция',
@@ -62,8 +62,33 @@ def __fill_lessons(courses_id: list):
 
 
 def __fill_shedule(institutes, lessons, groups):
+    shedule = Shedule(clear = True)
+
     deps_courses = institutes.get_departments_courses()
-    deps_specialities = institutes.get_departments_cpecialities()
+    deps_specialities = institutes.get_departments_specialities()
+
+    for department in deps_specialities:
+        specialities = deps_specialities[department]
+        own_courses = deps_courses[department]
+        foreign_courses = get_foreign_courses()
+
+        for speciality_id in specialities:
+            current_groups = groups.read_by_speciality_id(speciality_id)
+            current_foreign_courses = random.choices(foreign_courses, k=8)
+            all_lessons = lessons.read_by_course_ids(own_courses + foreign_courses)
+
+            for group in current_groups[0]:
+                
+                 
+            
+            
+
+
+
+        
+        
+
+
 
 # def __fill_students(groups_names, min = 10, max = 30):
 #     settings = parse_data('settings.py')
