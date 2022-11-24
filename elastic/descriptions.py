@@ -10,9 +10,9 @@ from elasticsearch_dsl import Document
 from elastic.elastic_manager import ElasticManager
 from random import randint
 
-currentdir = os.path.dirname(os.path.realpath(__file__))
-parentdir = os.path.dirname(currentdir)
-sys.path.append(parentdir)
+# currentdir = os.path.dirname(os.path.realpath(__file__))
+# parentdir = os.path.dirname(currentdir)
+# sys.path.append(parentdir)
 
 EQUIPMENT = ["компьютер", "проектор", "маркерная доска", "флеш-накопитель", "смарт-токен", "сетевой шкаф", "кликер",
              "набор маркеров", "проекционная доска", "чертежные наборы", "образ виртуальной машины kali linux"]
@@ -87,15 +87,15 @@ class Descriptions(Table):
             print('Equipment:', hit.equipment)
             print('Materials:', hit.materials)
 
-    def print(self, search):
-        for hit in self.read(search):
-            print('------------------------')
-            print('Name:', hit.Name)
-            print('Type:', hit.Type)
-            print('Content:', hit.Content)
+#     def print(self, search):
+#         for hit in self.read(search):
+#             print('------------------------')
+#             print('Name:', hit.Name)
+#             print('Type:', hit.Type)
+#             print('Content:', hit.Content)
 
-    def clear(self):
-        return super().clear()
+#     def clear(self):
+#         return super().clear()
 
-    def delete(self, query_map):
-        self.manager.delete(self.INDEX_NAME, query_map)
+#     def delete(self, query_map):
+#         self.manager.delete(self.INDEX_NAME, query_map)

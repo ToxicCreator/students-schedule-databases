@@ -4,15 +4,17 @@ from singleton import MetaSingleton
 
 # docker run -d --name postgres-cnt -p 5432:5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgrespw postgres
 
+database = "postgres"
+
 class PsqlManager(metaclass = MetaSingleton):
 
-    def __init__(self):
+    def __init__(self, host, port, login, password):
         self.connection = psycopg2.connect(
-            database = "postgres",
-            user = "postgres",
-            password = "postgrespw",
-            host = "host.docker.internal",
-            port = 49153
+            database = database,
+            user = login,
+            password = password,
+            host = host,
+            port = port
         )
         self.cursor = self.connection.cursor()
 

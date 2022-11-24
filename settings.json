@@ -13,7 +13,7 @@
   "neo4j": {
     "port": 27018,
     "login": "neo4j",
-    "passw": "password"
+    "password": "password"
   },
   "elasticsearch": {
     "port": 27019
