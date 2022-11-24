@@ -38,7 +38,7 @@ class Descriptions(Table):
                 'equipment': equip,
                 'materials': materials
             }
-        )
+        )['_id']
 
     def get_random_materials(self):
         titles = self.generator_api.get(10)
