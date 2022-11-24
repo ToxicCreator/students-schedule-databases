@@ -21,9 +21,18 @@ def generate_group_name(number) -> str:
     return ''.join(name)
 
 
-def get_lesson_date(lesson_number, lesson_count, year = 2022):
+def get_lesson_date(
+        lesson_number, 
+        lessons_count, 
+        first_month=1, 
+        last_month=12, 
+        year=2022
+    ):
+    assert lesson_number > lessons_count
+    assert 1990 <= year <= 2022
+    assert 1 <= first_month <= 12
+    assert 1 <= last_month <= 12
     day = randint(1, 28)
-    month = lesson_number // (lesson_count / 12)
-    if month == 0:
-        month = 1
+    months_count = last_month - first_month
+    month = lesson_number // (lessons_count / months_count) + first_month
     return date(year, int(month), day)
