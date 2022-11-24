@@ -9,7 +9,7 @@ import random
 #from faker import Faker
 # from neo4j_db.graph import Graph
 from mongo.institutes import Institutes
-from postgresql.shedule import Shedule
+from postgresql.schedule import Schedule
 from postgresql.groups import Groups
 from postgresql.lessons import Lessons
 # from elastic.descriptions import Descriptions
@@ -32,7 +32,7 @@ def fill():
 
     groups = __fill_groups(institutes.get_specialities_codes())
     lessons = __fill_lessons(institutes.get_courses_ids())
-    shedule =  __fill_shedule(institutes, lessons, groups)
+    schedule =  __fill_schedule(institutes, lessons, groups)
     # __fill_visits(groups_names)
 
 
@@ -61,8 +61,8 @@ def __fill_lessons(courses_id: list):
     return lessons
 
 
-def __fill_shedule(institutes, lessons, groups):
-    shedule = Shedule(clear = True)
+def __fill_schedule(institutes, lessons, groups):
+    schedule = Schedule(clear = True)
 
     deps_courses = institutes.get_departments_courses()
     deps_specialities = institutes.get_departments_specialities()
@@ -75,18 +75,32 @@ def __fill_shedule(institutes, lessons, groups):
         for speciality_id in specialities:
             current_groups = groups.read_by_speciality_id(speciality_id)
             current_foreign_courses = random.choices(foreign_courses, k=8)
-            all_lessons = lessons.read_by_course_ids(own_courses + foreign_courses)
+            own_lessons = lessons.read_by_course_ids(own_courses)
+            foreign_lessons = lessons.read_by_course_ids(current_foreign_courses)
 
-            for group in current_groups[0]:
-                
-                 
-            
-            
+            for group in current_groups:
+                group_id = group[0]
+                first_year = random.choice([2017, 2018, 2019, 2020])
 
+                for i in range(len(own_lessons)):
+                    lesson_id = own_lessons[i][0]
+                    date = get_lesson_date(
+                        lesson_number=i,
+                        lessons_count=len(own_lessons),
+                        months_count=45,
+                        first_year=first_year
+                    )
+                    schedule.insert(date, lesson_id, group_id)
 
-
-        
-        
+                for i in range(len(foreign_lessons)):
+                    lesson_id = foreign_lessons[i][0]
+                    date = get_lesson_date(
+                        lesson_number=i,
+                        lessons_count=len(foreign_lessons),
+                        months_count=45,
+                        first_year=first_year
+                    )
+                    schedule.insert(date, lesson_id, group_id)
 
 
 

@@ -10,8 +10,8 @@ parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
 
 
-class Shedule(Table):
-    TABLE_NAME = 'shedule'
+class Schedule(Table):
+    TABLE_NAME = 'schedule'
 
     def __init__(self, clear = False):
         settings = parse_data('settings.json')
@@ -43,10 +43,10 @@ class Shedule(Table):
         except (Exception,):
             return False
 
-    def read(self, shedule_id) -> List[tuple]:
+    def read(self, schedule_id) -> List[tuple]:
         query = f'''
             SELECT * FROM {self.TABLE_NAME} 
-            WHERE id = '{shedule_id}'
+            WHERE id = '{schedule_id}'
         '''
         self.psql.execute_and_commit(query)
         return self.psql.cursor.fetchall()
