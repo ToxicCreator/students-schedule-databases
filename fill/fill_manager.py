@@ -31,7 +31,7 @@ def fill():
     groups = __fill_groups(institutes.get_specialities_codes())
     lessons = __fill_lessons(institutes.get_courses_ids())
     schedule =  __fill_schedule(institutes, lessons, groups)
-    #__fill_students(groups.read_all_ids())
+    __fill_students(groups.read_all_ids())
     # __fill_visits(groups_names)
 
 
@@ -50,12 +50,13 @@ def __fill_groups(specialities_codes):
     
 def __fill_lessons(courses_id: list):
     lessons = Lessons(clear = True)
+    descriprions = Descriptions()
 
     for id in courses_id:
         for lection_num in range(1, 9):
-            lessons.insert(TYPES[0], id, 1)
+            lessons.insert(TYPES[0], id, descriprions.insert())
         for practic_num in range(1, 17):
-            lessons.insert(TYPES[1], id, 1)
+            lessons.insert(TYPES[1], id, descriprions.insert())
     
     return lessons
 
@@ -101,7 +102,7 @@ def __fill_schedule(institutes, lessons, groups):
                     schedule.insert(date, lesson_id, group_id)
 
 def __fill_students(groups, min = 10, max = 30):
-    settings = parse_data('../settings.py')
+    settings = parse_data('settings.json')
     students = Students(settings["host"], settings["redis"]["port"], clear=True)
     groups_students = {}
     for group in groups:

@@ -9,6 +9,7 @@ from random import randint
 from elasticsearch_dsl import Document
 from fishtext import FishTextJson
 from fishtext.types import TextType, JsonAPIResponse
+from utils import parse_data
 
 currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
@@ -17,14 +18,15 @@ sys.path.append(parentdir)
 EQUIPMENT = ["компьютер", "проектор", "маркерная доска", "флеш-накопитель", "смарт-токен", "сетевой шкаф", "кликер",
              "набор маркеров", "проекционная доска", "чертежные наборы", "образ виртуальной машины kali linux"]
 
-class Descriptions(Table):
+class Descriptions():
     TABLE_NAME = 'description'
     INDEX_NAME = 'lessons'
 
     def __init__(self, clear=False):
-        self.manager = ElasticManager()
+        settings = parse_data('settings.json')
+        self.manager = ElasticManager(settings["host"], settings["elasticsearch"]["port"])
         self.generator_api = FishTextJson(text_type=TextType.Title)
-        time.sleep(10)
+        # time.sleep(10)
         if clear:
             self.manager.delete_index(self.INDEX_NAME)
         self.lessons_index = self.manager.create_index(self.INDEX_NAME)
@@ -38,7 +40,7 @@ class Descriptions(Table):
                 'equipment': equip,
                 'materials': materials
             }
-        )
+        )['_id']
 
     def get_random_materials(self):
         titles = self.generator_api.get(10)

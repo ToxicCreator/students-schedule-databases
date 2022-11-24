@@ -36,7 +36,7 @@ class Lessons(Table):
                 id SERIAL PRIMARY KEY NOT NULL,
                 type lessType NOT NULL,
                 course_id SMALLINT NOT NULL,
-                description_id int NOT NULL
+                description_id VARCHAR(50) NOT NULL
             );
         '''
         self.psql.execute_and_commit(query)
