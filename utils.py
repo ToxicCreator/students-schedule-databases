@@ -13,7 +13,7 @@ def check_chance(chance) -> bool:
     return randint(0, 100) <= chance
 
 
-def generate_group_name(number) -> str:
+def generate_group_name() -> str:
     letters = "БСБОКМПФРСГУДИЭХТВ"
 
     groupCode = ''.join(choice(letters) for i in range(4))
@@ -39,3 +39,12 @@ def get_lesson_date(
     months_count = last_month - first_month
     month = lesson_number // (lessons_count / months_count) + first_month
     return date(year, int(month), day)
+
+def get_foreign_courses(own_department_id, department_courses):
+    foreign_courses = []
+
+    for department_id in department_courses:
+        if department_id != own_department_id:
+            foreign_courses.extend(department_courses[department_id])
+
+    return foreign_courses

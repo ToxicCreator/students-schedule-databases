@@ -49,6 +49,14 @@ class Groups(Table):
         self.psql.execute_and_commit(query)
         return self.psql.cursor.fetchone()
 
+    def read_by_speciality_id(self, spiciality_id):
+        query = f'''
+            SELECT name FROM {self.TABLE_NAME}
+            WHERE speciality_id = {spiciality_id}
+        '''
+        self.psql.execute_and_commit(query)
+        return self.psql.cursor.fetchall()
+
     def clear(self) -> None:
         self.psql.drop_table(self.TABLE_NAME)
 
