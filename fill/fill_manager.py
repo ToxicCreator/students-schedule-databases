@@ -29,14 +29,15 @@ TYPES = [
 
 def fill():
     Faker.seed(0)
-    # graph = Graph()
-    # graph.clear()
-    # specialities_codes = __fill_institutes()
-    # courses_id = __fill_courses(specialities_codes, min_duration=2, max_duration=4)
-    # groups_names = __fill_groups(specialities_codes)
-    # __fill_lessons(courses_id)
+    graph = Graph()
+    graph.clear()
+    specialities_codes = __fill_institutes()
+    courses_id = __fill_courses(specialities_codes, min_duration=2, max_duration=4)
+    groups_names = __fill_groups(specialities_codes)
+    __fill_lessons(courses_id)
     __fill_students(groups_names=group_names, min=10, max=20)
-    # __fill_visits(groups_names)
+    __fill_visits(groups_names)
+    
 
 
 def __fill_institutes():
