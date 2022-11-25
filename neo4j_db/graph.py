@@ -1,16 +1,19 @@
 import os
 import sys
-from neo4j_db.neo4j_manager import Neo4jManager
-from utils import parse_data
 
 currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
 
+from neo4j_db.neo4j_manager import Neo4jManager
+from utils import parse_data
+
+
+
 
 class Graph:
     def __init__(self):
-        settings = parse_data('../settings.py')
+        settings = parse_data('settings.json')
         self.client = Neo4jManager(settings["host"], settings["neo4j"]["port"],
                                    settings["neo4j"]["login"], settings["neo4j"]["password"])
 

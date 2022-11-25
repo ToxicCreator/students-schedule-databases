@@ -15,8 +15,8 @@ collection_name = 'institutes'
 
 class Institutes:
     def __init__(self, clear = False):
-        settings = parse_data('../settings.json')
-        self.mongo = MongoManager(settings["host"], settings["mongo"]["port"], database_name)
+        settings = parse_data('settings.json')
+        self.mongo = MongoManager(settings["host"], settings["mongodb"]["port"], database_name)
         self.graph = Graph()
         if clear:
             self.mongo.remove_collection(collection_name)
@@ -48,26 +48,47 @@ class Institutes:
 
     def get_specialities_codes(self):
         codes = []
-        institutes = self.collection.find({}, {
-            'departments.specialities': 1
-        })
+        institutes = self.collection.find({})
+
         for institute in institutes:
-            for department in institute['departments']:
-                for speciality in department['specialities']:
-                    codes.append(speciality['code'])
+            for department in institute['Departments']:
+                for speciality in department['Specialities']:
+                    codes.append(speciality['Code'])
         return codes
 
-    # def get_courses_id(self):
-    #     courses_id = []
-    #     institutes = self.collection.find({}, {
-    #         'departments.specialities.courses': 1
-    #     })
-    #     for institute in institutes:
-    #         for department in institute['departments']:
-    #             for speciality in department['specialities']:
-    #                 for course in speciality['courses']:
-    #                     courses_id.append(course['_id'])
-    #     return courses_id
+    def get_courses_ids(self):
+        courses = []
+        institutes = self.collection.find({})
+
+        for institute in institutes:
+            for department in institute['Departments']:
+                for course in department['Courses']:
+                    courses.append(course['ID'])
+                    
+        return courses
+
+    def get_departments_courses(self):
+        dep_courses = {}
+        institutes = self.collection.find({})
+
+        for institute in institutes:
+            for department in institute['Departments']:
+                dep_courses[department["Code"]] = []
+                for course in department['Courses']:
+                    dep_courses[department["Code"]].append(course["ID"])
+        return dep_courses
+
+    def get_departments_specialities(self):
+        deps_specialities = {}
+        institutes = self.collection.find({})
+
+        for institute in institutes:
+            for department in institute['Departments']:
+                deps_specialities[department["Code"]] = []
+                for speciality in department['Specialities']:
+                    deps_specialities[department["Code"]].append(speciality["Code"])
+        return deps_specialities
+
 
     def read(self, filter):
         return self.collection.find(filter, {'_id': 0})

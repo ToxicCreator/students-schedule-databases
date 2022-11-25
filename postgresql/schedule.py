@@ -3,17 +3,20 @@ import sys
 from typing import List
 from table import Table
 from postgresql.psql_manager import PsqlManager
+from utils import parse_data
 
 currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
 
 
-class GroupsLessons(Table):
-    TABLE_NAME = 'groups_lessons'
+class Schedule(Table):
+    TABLE_NAME = 'schedule'
 
     def __init__(self, clear = False):
-        self.psql = PsqlManager()
+        settings = parse_data('settings.json')
+        self.psql = PsqlManager(settings["host"], settings["postgresql"]["port"], 
+                                settings["postgresql"]["login"], settings["postgresql"]["password"])
         if clear:
             self.clear()
         self.create_table()
@@ -22,37 +25,36 @@ class GroupsLessons(Table):
         query = f'''
             CREATE TABLE IF NOT EXISTS {self.TABLE_NAME} (
                 id SERIAL PRIMARY KEY NOT NULL,
-                group_name VARCHAR(10) NOT NULL,
-                lesson_id int NOT NULL
+                date date NOT NULL,
+                lesson_id int NOT NULL,
+                group_id VARCHAR(10) NOT NULL
             );
         '''
         self.psql.execute_and_commit(query)
+        self.__make_partition()
 
-    def insert(self, group_name, lesson_id):
+    def __make_partition(self):
+        with open("postgresql/schedulePartitionCfg.txt") as file:
+            self.psql.execute_and_commit(file.read())
+
+    def insert(self, date, lesson_id, group_id):
         try:
             self.psql.insert(self.TABLE_NAME, {
-                'group_name': group_name,
-                'lesson_id': lesson_id
+                'date': date,
+                'lesson_id': lesson_id,
+                'group_id': group_id
             })
             return True
         except (Exception,):
             return False
 
-    def read(self, groups_lessons_id) -> List[tuple]:
+    def read(self, schedule_id) -> List[tuple]:
         query = f'''
             SELECT * FROM {self.TABLE_NAME} 
-            WHERE id = '{groups_lessons_id}'
+            WHERE id = '{schedule_id}'
         '''
         self.psql.execute_and_commit(query)
         return self.psql.cursor.fetchall()
 
     def clear(self):
         self.psql.drop_table(self.TABLE_NAME)
-
-    def get_lessons(self, group_name) -> List[tuple]:
-        query = f'''
-            SELECT lesson_id FROM {self.TABLE_NAME} 
-            WHERE group_name = '{group_name}'
-        '''
-        self.psql.execute_and_commit(query)
-        return self.psql.cursor.fetchall()

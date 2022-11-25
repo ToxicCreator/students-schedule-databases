@@ -52,14 +52,11 @@ class Students(Table):
 
 
     def __get_shifr(self):
-        shifr = [random.choice('АБВГД') for _ in range(3)]
-        shifr.append('-')
-        shifr += [random.choice('0123456789') for _ in range(5)]
-        shifr = ''.join(shifr)
-        if shifr in self.__shifrs:
-            return self.__get_shifr()
-        self.__shifrs.add(shifr)
-        return shifr
+        letters = "БСБОКМПФРСГУДИЭХТВ"
+        recordBook = str(random.randint(18, 22))
+        recordBook += ''.join(random.choice(letters) for i in range(2))
+        recordBook += str(random.randint(100, 999))
+        return recordBook
 
 
     def get_by_group(self, group_name):

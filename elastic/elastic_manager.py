@@ -16,8 +16,8 @@ LAG = 0.5
 
 class ElasticManager(metaclass = MetaSingleton):
 
-    def __init__(self):
-        self.__client__ = Elasticsearch('http://root:root@localhost:9200')
+    def __init__(self, host, port):
+        self.__client__ = Elasticsearch('http://root:root@{0}:{1}'.format(host, port))
 
     def create_index(self, name):
         index = Index(name, using = self.__client__)

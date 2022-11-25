@@ -1,0 +1,30 @@
+CREATE index visitDate on visits (date);
+
+CREATE TABLE visits1  (CHECK (date_part('month', date) = 1))  INHERITS (visits);
+CREATE TABLE visits2  (CHECK (date_part('month', date) = 2))  INHERITS (visits);
+CREATE TABLE visits3  (CHECK (date_part('month', date) = 3))  INHERITS (visits);
+CREATE TABLE visits4  (CHECK (date_part('month', date) = 4))  INHERITS (visits);
+CREATE TABLE visits5  (CHECK (date_part('month', date) = 5))  INHERITS (visits);
+CREATE TABLE visits6  (CHECK (date_part('month', date) = 6))  INHERITS (visits);
+CREATE TABLE visits7  (CHECK (date_part('month', date) = 7))  INHERITS (visits);
+CREATE TABLE visits8  (CHECK (date_part('month', date) = 8))  INHERITS (visits);
+CREATE TABLE visits9  (CHECK (date_part('month', date) = 9))  INHERITS (visits);
+CREATE TABLE visits10 (CHECK (date_part('month', date) = 10)) INHERITS (visits);
+CREATE TABLE visits11 (CHECK (date_part('month', date) = 11)) INHERITS (visits);
+CREATE TABLE visits12 (CHECK (date_part('month', date) = 12)) INHERITS (visits);
+
+CREATE OR REPLACE FUNCTION visitsPartitionInsert()
+  RETURNS trigger AS
+$$
+DECLARE
+    partitionName text;
+
+BEGIN
+    partitionName := format( 'visits%s', date_part( 'month', NEW.date)::integer );
+    execute 'INSERT INTO ' || partitionName || ' VALUES ( ($1).* )' USING NEW;
+    RETURN null;
+END;
+$$
+LANGUAGE 'plpgsql';
+
+create trigger visitsPartition before insert on visits for each row execute procedure visitsPartitionInsert();
