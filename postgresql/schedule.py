@@ -31,6 +31,11 @@ class Schedule(Table):
             );
         '''
         self.psql.execute_and_commit(query)
+        self.__make_partition()
+
+    def __make_partition(self):
+        with open("postgresql/schedulePartitionCfg.txt") as file:
+            self.psql.execute_and_commit(file.read())
 
     def insert(self, date, lesson_id, group_id):
         try:

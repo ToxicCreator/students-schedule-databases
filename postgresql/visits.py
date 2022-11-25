@@ -3,6 +3,7 @@ import sys
 from postgresql.psql_manager import PsqlManager
 from table import Table
 from neo4j_db.graph import Graph
+from utils import parse_data
 
 currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
@@ -13,7 +14,9 @@ class Visits(Table):
     TABLE_NAME = 'visits'
 
     def __init__(self, clear = False):
-        self.psql = PsqlManager()
+        settings = parse_data('settings.json')
+        self.psql = PsqlManager(settings["host"], settings["postgresql"]["port"], 
+                                settings["postgresql"]["login"], settings["postgresql"]["password"])
         self.graph = Graph()
         if clear:
             self.clear()
@@ -22,21 +25,29 @@ class Visits(Table):
     def create_table(self):
         query = f'''
             CREATE TABLE IF NOT EXISTS {self.TABLE_NAME} (
-                lesson INT NULL,
-                student VARCHAR(9) NOT NULL,
-                visited BOOLEAN DEFAULT false
+                id serial PRIMARY KEY NOT NULL,
+                shedule_id int NOT NULL,
+                student_id VARCHAR(7) NOT NULL,
+                date date NOT NULL,
+                visited boolean NOT NULL
             );
         '''
         self.psql.execute_and_commit(query)
+        self.__make_partition()
 
-    def insert(self, lesson_id, student_id, visited = False):
+    def __make_partition(self):
+        with open("postgresql/visitsPartitionCfg.txt") as file:
+            self.psql.execute_and_commit(file.read())
+
+    def insert(self, shedule_id, student_id, date, visited = False):
         map_key_values = {
-            'lesson': lesson_id,
-            'student': student_id,
+            'shedule_id' : shedule_id,
+            'student_id' : student_id,
+            'date' : date,
             'visited': visited
         }
         self.psql.insert(self.TABLE_NAME, map_key_values)
-        self.graph.create_visit_node(lesson_id, student_id, visited)
+        # self.graph.create_visit_node(lesson_id, student_id, visited)
 
     def read(self, studentID, lessonID):
         query = f'''

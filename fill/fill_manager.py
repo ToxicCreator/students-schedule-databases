@@ -30,9 +30,9 @@ def fill():
 
     groups = __fill_groups(institutes.get_specialities_codes())
     lessons = __fill_lessons(institutes.get_courses_ids())
-    schedule =  __fill_schedule(institutes, lessons, groups)
-    __fill_students(groups.read_all_ids())
-    # __fill_visits(groups_names)
+    groups_schedule =  __fill_schedule(institutes, lessons, groups)
+    groups_students = __fill_students(groups.read_all_ids())
+    __fill_visits(groups_schedule, groups_students)
 
 
 def __fill_institutes():
@@ -54,9 +54,9 @@ def __fill_lessons(courses_id: list):
 
     for id in courses_id:
         for lection_num in range(1, 9):
-            lessons.insert(TYPES[0], id, descriprions.insert())
+            lessons.insert(TYPES[0], id, "qwe") #descriprions.insert()
         for practic_num in range(1, 17):
-            lessons.insert(TYPES[1], id, descriprions.insert())
+            lessons.insert(TYPES[1], id, "qwe") #descriprions.insert()
     
     return lessons
 
@@ -65,6 +65,10 @@ def __fill_schedule(institutes, lessons, groups):
 
     deps_courses = institutes.get_departments_courses()
     deps_specialities = institutes.get_departments_specialities()
+
+    groups_schedule = {}
+
+    current_schedule_id = 1
 
     for department in deps_specialities:
         specialities = deps_specialities[department]
@@ -80,6 +84,7 @@ def __fill_schedule(institutes, lessons, groups):
             for group in current_groups:
                 group_id = group[0]
                 first_year = random.choice([2017, 2018, 2019, 2020])
+                groups_schedule[group_id] = []
 
                 for i in range(len(own_lessons)):
                     lesson_id = own_lessons[i][0]
@@ -89,7 +94,9 @@ def __fill_schedule(institutes, lessons, groups):
                         months_count=45,
                         first_year=first_year
                     )
+                    groups_schedule[group_id].append([current_schedule_id, date])
                     schedule.insert(date, lesson_id, group_id)
+                    current_schedule_id += 1
 
                 for i in range(len(foreign_lessons)):
                     lesson_id = foreign_lessons[i][0]
@@ -99,7 +106,11 @@ def __fill_schedule(institutes, lessons, groups):
                         months_count=45,
                         first_year=first_year
                     )
+                    groups_schedule[group_id].append([current_schedule_id, date])
                     schedule.insert(date, lesson_id, group_id)
+                    current_schedule_id += 1
+
+    return groups_schedule
 
 def __fill_students(groups, min = 10, max = 30):
     settings = parse_data('settings.json')
@@ -108,8 +119,15 @@ def __fill_students(groups, min = 10, max = 30):
     for group in groups:
         group_name = group[0]
         groups_students[group_name] = []
-        count = random.randint(min, max)
-        for i in range(count):
+        for i in range(random.randint(min, max)):
             student = students.insert(name=get_first_name(), surname=get_last_name(), group_name=group_name)
             groups_students[group_name].append(student)
     return groups_students
+
+def __fill_visits(groups_schedule, groups_students):
+    visits = Visits(clear = True)
+
+    for group in groups_schedule:
+        for schedule_id_date in groups_schedule[group]:
+            for student in groups_students[group]:
+                visits.insert(schedule_id_date[0], student, schedule_id_date[1], check_chance(0.7))
