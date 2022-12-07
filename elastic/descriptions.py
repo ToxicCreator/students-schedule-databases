@@ -18,7 +18,7 @@ sys.path.append(parentdir)
 EQUIPMENT = ["компьютер", "проектор", "маркерная доска", "флеш-накопитель", "смарт-токен", "сетевой шкаф", "кликер",
              "набор маркеров", "проекционная доска", "чертежные наборы", "образ виртуальной машины kali linux"]
 
-class Descriptions():
+class Descriptions:
     TABLE_NAME = 'description'
     INDEX_NAME = 'lessons'
 
@@ -26,7 +26,7 @@ class Descriptions():
         settings = parse_data('settings.json')
         self.manager = ElasticManager(settings["host"], settings["elasticsearch"]["port"])
         self.generator_api = FishTextJson(text_type=TextType.Title)
-        # time.sleep(10)
+        time.sleep(10)
         if clear:
             self.manager.delete_index(self.INDEX_NAME)
         self.lessons_index = self.manager.create_index(self.INDEX_NAME)

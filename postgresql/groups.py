@@ -12,11 +12,11 @@ sys.path.append(parentdir)
 class Groups(Table):
     TABLE_NAME = 'groups'
 
-    def __init__(self, clear = False):
+    def __init__(self, clear=False):
         settings = parse_data('settings.json')
         self.psql = PsqlManager(settings["host"], settings["postgresql"]["port"], 
                                 settings["postgresql"]["login"], settings["postgresql"]["password"])
-        # self.graph = Graph()
+        self.graph = Graph()
         if clear:
             self.clear()
         self.create_table()
@@ -36,6 +36,9 @@ class Groups(Table):
             'speciality_id': speciality_id
         }
         self.psql.insert(self.TABLE_NAME, values)
+        self.graph.create_group_node(name=name,
+                                     spec_code=speciality_id)
+        return name
         # if self.psql.insert(self.TABLE_NAME, values):
         #     self.graph.create_group_node(name, code)
         #     return name

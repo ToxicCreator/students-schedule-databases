@@ -22,64 +22,51 @@ class Graph:
             'name': name
         })
 
-    def create_department_node(self, name, institute_name):
-        query = f'''
-            MATCH (i:institute {{name: '{institute_name}'}})
-            CREATE (d:department)-[:in]->(i)
-            SET d = $params
-            RETURN d;
-        '''
-        return self.client.execute(query, {
-            'name': name
-        }).single()
+    def create_department_node(self, name):
+        return self.client.create_node('department',
+                                       {'Name': name})
 
-    def create_speciality_node(self, code, name, department_name):
+    def create_speciality_node(self, name, code, department_name):
         query = f'''
-            MATCH (d:department {{name: '{department_name}'}})
-            CREATE (s:speciality)-[:in]->(d)
+            MATCH (d:department {{Name: '{department_name}'}})
+            CREATE (s:speciality)-[:belongs_to]->(d)
             SET s = $params
             RETURN s;
         '''
         return self.client.execute(query, {
-            'code': code,
-            'name': name
+            'Name': name,
+            'Code': code
         }).single()
 
-    def create_course_node(self, id, values):
-        values['id'] = id
+    def create_course_node(self, name, department_name):
         query = f'''
-            MATCH (s:speciality {{code: ''}})
-            CREATE (c:course)-[:in]->(s)
+            MATCH (d:department {{Name: '{department_name}'}})
+            CREATE (c:course)-[:is_taught_by]->(d)
             SET c = $params
             RETURN c;
         '''
-        return self.client.execute(query, values).single()
+        return self.client.execute(query, {
+            'Name': name
+        }).single()
 
-    def create_lesson_node(self, id, course_id, values):
+    def create_group_node(self, name, spec_code):
         query = f'''
-            MATCH (c:course {{id: {course_id}}})
-            CREATE (l:lesson)-[:in]->(c)
-            SET l = $params;
-        '''
-        values['id'] = id
-        return self.client.execute(query, values).single()
+                   MATCH (s:speciality {{Code: '{spec_code}'}})
+                   CREATE (g:group)-[:member_of]->(s)
+                   SET g = $params;
+               '''
+        return self.client.execute(query, {
+            'Name': name
+        }).single()
 
-    def create_group_node(self, name, code):
-        return self.client.create_node('group', {
-            'name': name,
-            'code': code
-        })
-
-    def create_student_node(self, id, name, group_name):
+    def create_student_node(self, recordbook, group_name):
         query = f'''
-            MATCH (g:group {{name: '{group_name}'}})
-            CREATE (s:student)-[:member]->(g)
-            SET s = $params;
+            MATCH (g:group {{Name: '{group_name}'}})
+            CREATE (st:student)-[:member]->(g)
+            SET st = $params;
         '''
         return self.client.execute(query, {
-            'id': id,
-            'name': name,
-            'group_name': group_name
+            'RecordBook': recordbook
         }).single()
 
     def create_visit_node(self, lesson_id, student_id, visited):
@@ -93,6 +80,25 @@ class Graph:
             RETURN l, s, r;
         '''
         return self.client.execute(query).single()
+
+    def create_student_course_tie(self, group_name, course_names):
+        query = f'''
+            MATCH (g:group {{Name: '{group_name}'}})<-[:member]-(st:student) WITH st
+            MATCH (c:course) WHERE c.Name IN {course_names} 
+            CREATE (st)-[:studying]->(c)'''
+        self.client.execute(query, {}).single()
+
+    def create_lesson_node(self, lesson_id, course_name):
+        query = f'''
+           MATCH (c:course {{Name: '{course_name}'}})
+           CREATE (l:lesson)-[:part_of]->(c)
+           SET l = $params
+           RETURN l;
+        '''
+        return self.client.execute(query, {
+            'Id': lesson_id
+        }).single()
+
 
     def clear(self):
         self.client.clear_all()

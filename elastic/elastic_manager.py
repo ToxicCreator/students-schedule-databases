@@ -14,13 +14,13 @@ from singleton import MetaSingleton
 LAG = 0.5
 
 
-class ElasticManager(metaclass = MetaSingleton):
+class ElasticManager(metaclass=MetaSingleton):
 
     def __init__(self, host, port):
         self.__client__ = Elasticsearch('http://root:root@{0}:{1}'.format(host, port))
 
     def create_index(self, name):
-        index = Index(name, using = self.__client__)
+        index = Index(name, using=self.__client__)
         if not index.exists():
             index.create()
         time.sleep(LAG)
@@ -35,8 +35,8 @@ class ElasticManager(metaclass = MetaSingleton):
 
     def create_document(self, index, document):
         new_index = self.__client__.index(
-            index = index,
-            document = document
+            index=index,
+            document=document
         )
         time.sleep(LAG)
         return new_index

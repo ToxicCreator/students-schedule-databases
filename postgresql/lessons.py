@@ -2,7 +2,7 @@ import os
 import sys
 from postgresql.psql_manager import PsqlManager
 from table import Table
-# from neo4j_db.graph import Graph
+from neo4j_db.graph import Graph
 from utils import parse_data
 
 currentdir = os.path.dirname(os.path.realpath(__file__))
@@ -14,11 +14,11 @@ week_count = 53
 class Lessons(Table):
     TABLE_NAME = 'lessons'
 
-    def __init__(self, clear = False):
+    def __init__(self, clear=False):
         settings = parse_data('settings.json')
         self.psql = PsqlManager(settings["host"], settings["postgresql"]["port"], 
                                 settings["postgresql"]["login"], settings["postgresql"]["password"])
-        # self.graph = Graph()
+        self.graph = Graph()
         if clear:
             self.clear()
         self.create_table()
@@ -41,14 +41,14 @@ class Lessons(Table):
         '''
         self.psql.execute_and_commit(query)
 
-    def insert(self, lesson_type, course_id, description_id):
+    def insert(self, lesson_type, course_id, course_name, description_id):
         values = {
             'type': lesson_type,
             'course_id': course_id,
             'description_id': description_id
         }
         lesson_id = self.psql.insert(self.TABLE_NAME, values)[0]
-        # self.graph.create_lesson_node(lesson_id, course_id, values)
+        self.graph.create_lesson_node(lesson_id, course_name)
         return lesson_id
 
     def read(self, lesson_id) -> tuple:
@@ -66,11 +66,18 @@ class Lessons(Table):
             WHERE course_id = {' OR course_id = '.join([str(course) for course in course_ids])} 
             GROUP BY course_id, id
         '''
-
+        self.psql.execute_and_commit(query)
+        return self.psql.cursor.fetchall()
+        
+    def read_by_lesson_ids(self, lesson_ids):
+        query = f'''
+                   SELECT DISTINCT course_id FROM {self.TABLE_NAME} 
+                   WHERE id = {' OR id = '.join([str(lesson) for lesson in lesson_ids])} 
+               '''
         self.psql.execute_and_commit(query)
         return self.psql.cursor.fetchall()
 
-    def update(self, lesson_id, name = False, lesson_type = False, course_id = False) -> None:
+    def update(self, lesson_id, name=False, lesson_type = False, course_id = False) -> None:
         if lesson_type:
             self.update_type(lesson_id, lesson_type)
         if course_id:
