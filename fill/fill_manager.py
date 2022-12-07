@@ -138,20 +138,6 @@ def __fill_visits(groups_schedule, groups_students):
         for schedule_id_date in groups_schedule[group]:
             for student in groups_students[group]:
                 visits.insert(schedule_id_date[0], student, schedule_id_date[1], check_chance(0.7))
-                i += 1
-    print(i)
-
-
-if __name__ == "__main__":
-    fill()
-                i += 1
-    print(i)
-
-
-if __name__ == "__main__":
-    fill()
-                i += 1
-    print(i)
 
 
 if __name__ == "__main__":
