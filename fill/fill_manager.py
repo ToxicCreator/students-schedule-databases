@@ -6,7 +6,7 @@ parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
 
 import random
-# from neo4j_db.graph import Graph
+from neo4j_db.graph import Graph
 from mongo.institutes import Institutes
 from postgresql.schedule import Schedule
 from postgresql.groups import Groups
@@ -25,43 +25,43 @@ TYPES = [
 def fill():
     # graph = Graph()
     # graph.clear()
-
     institutes = __fill_institutes()
-
     groups = __fill_groups(institutes.get_specialities_codes())
-    lessons = __fill_lessons(institutes.get_courses_ids())
-    groups_schedule =  __fill_schedule(institutes, lessons, groups)
-    groups_students = __fill_students(groups.read_all_ids())
+    lessons = __fill_lessons(institutes.get_courses_ids(), institutes)
+    schedule, groups_schedule = __fill_schedule(institutes, lessons, groups)
+    groups_students = __fill_students(groups.read_all_ids(), schedule, lessons, institutes)
     __fill_visits(groups_schedule, groups_students)
 
 
 def __fill_institutes():
-    institutes = Institutes(clear = True)
-    institutes.fill('fill/mongoInit.json')
+    institutes = Institutes(clear=True)
+    institutes.parse_institutes(path='fill/mongoInit.json')
+    institutes.fill()
+    institutes.make_neo4j_shortcuts()
     return institutes
 
 def __fill_groups(specialities_codes):
     groups = Groups(clear=True)
-
     for id in specialities_codes:
         for groups_count in range(random.randint(2, 5)):
-            groups.insert(generate_group_name(), id)
+            group_name = generate_group_name()
+            groups.insert(group_name, id)
     return groups
     
-def __fill_lessons(courses_id: list):
-    lessons = Lessons(clear = True)
-    descriprions = Descriptions()
-
-    for id in courses_id:
+def __fill_lessons(courses_id: list, institutes):
+    courses_names = institutes.get_course_names_by_ids(courses_id)
+    lessons = Lessons(clear=True)
+    descriptions = Descriptions()
+    for i in range(len(courses_id)):
         for lection_num in range(1, 9):
-            lessons.insert(TYPES[0], id, "qwe") #descriprions.insert()
+            lessons.insert(TYPES[0], courses_id[i], courses_names[i], "qwe") #descriptions.insert()
         for practic_num in range(1, 17):
-            lessons.insert(TYPES[1], id, "qwe") #descriprions.insert()
+            lessons.insert(TYPES[1], courses_id[i], courses_names[i], "qwe") #descriptions.insert()
     
     return lessons
 
 def __fill_schedule(institutes, lessons, groups):
-    schedule = Schedule(clear = True)
+    schedule = Schedule(clear=True)
 
     deps_courses = institutes.get_departments_courses()
     deps_specialities = institutes.get_departments_specialities()
@@ -110,9 +110,11 @@ def __fill_schedule(institutes, lessons, groups):
                     schedule.insert(date, lesson_id, group_id)
                     current_schedule_id += 1
 
-    return groups_schedule
+    return schedule, groups_schedule
 
-def __fill_students(groups, min = 10, max = 30):
+
+def __fill_students(groups, schedule, lessons, institutes, min=10, max=30):
+    graph = Graph()
     settings = parse_data('settings.json')
     students = Students(settings["host"], settings["redis"]["port"], clear=True)
     groups_students = {}
@@ -122,12 +124,21 @@ def __fill_students(groups, min = 10, max = 30):
         for i in range(random.randint(min, max)):
             student = students.insert(name=get_first_name(), surname=get_last_name(), group_name=group_name)
             groups_students[group_name].append(student)
+        lesson_ids = [lesson[0] for lesson in schedule.read_lessons_by_group(group_name)]
+        courses = [course[0] for course in lessons.read_by_lesson_ids(lesson_ids)]
+        course_names = institutes.get_course_names_by_ids(courses)
+        graph.create_student_course_tie(group_name=group_name, course_names=course_names)
     return groups_students
 
-def __fill_visits(groups_schedule, groups_students):
-    visits = Visits(clear = True)
 
+def __fill_visits(groups_schedule, groups_students):
+    visits = Visits(clear=True)
+    i = 0
     for group in groups_schedule:
         for schedule_id_date in groups_schedule[group]:
             for student in groups_students[group]:
                 visits.insert(schedule_id_date[0], student, schedule_id_date[1], check_chance(0.7))
+
+
+if __name__ == "__main__":
+    fill()
