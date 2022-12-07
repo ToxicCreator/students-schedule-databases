@@ -2,7 +2,6 @@ import os
 import sys
 from postgresql.psql_manager import PsqlManager
 from table import Table
-# from neo4j_db.graph import Graph
 from utils import parse_data
 
 currentdir = os.path.dirname(os.path.realpath(__file__))
@@ -18,7 +17,6 @@ class Lessons(Table):
         settings = parse_data('settings.json')
         self.psql = PsqlManager(settings["host"], settings["postgresql"]["port"], 
                                 settings["postgresql"]["login"], settings["postgresql"]["password"])
-        # self.graph = Graph()
         if clear:
             self.clear()
         self.create_table()

@@ -2,6 +2,7 @@ import os
 import sys
 from postgresql.psql_manager import PsqlManager
 from table import Table
+from neo4j_db.graph import Graph
 from utils import parse_data
 
 currentdir = os.path.dirname(os.path.realpath(__file__))
@@ -9,8 +10,8 @@ parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
 
 
-class Visits(Table):
-    TABLE_NAME = 'visits'
+class Students(Table):
+    TABLE_NAME = 'students'
 
     def __init__(self, clear = False):
         settings = parse_data('settings.json')
@@ -23,37 +24,31 @@ class Visits(Table):
     def create_table(self):
         query = f'''
             CREATE TABLE IF NOT EXISTS {self.TABLE_NAME} (
-                id serial PRIMARY KEY NOT NULL,
-                shedule_id int NOT NULL,
-                student_id VARCHAR(7) NOT NULL,
-                date date NOT NULL,
-                visited boolean NOT NULL
+                id VARCHAR(7) PRIMARY KEY NOT NULL,
+                group_id VARCHAR(10) NOT NULL,
+                name VARCHAR(30) NOT NULL,
+                surname VARCHAR(30) NOT NULL
             );
         '''
         self.psql.execute_and_commit(query)
-        self.__make_partition()
 
-    def __make_partition(self):
-        with open("postgresql/visitsPartitionCfg.txt") as file:
-            self.psql.execute_and_commit(file.read())
-
-    def insert(self, shedule_id, student_id, date, visited = False):
-        map_key_values = {
-            'shedule_id' : shedule_id,
-            'student_id' : student_id,
-            'date' : date,
-            'visited': visited
-        }
-        self.psql.insert(self.TABLE_NAME, map_key_values)
-
-    def read(self, studentID, lessonID):
+    def read(self, student_id):
         query = f'''
             SELECT * FROM {self.TABLE_NAME} 
-            WHERE student = {studentID} 
-            AND lesson = {lessonID}
+            WHERE id = '{student_id}'
         '''
         self.psql.execute_and_commit(query)
         return self.psql.cursor.fetchall()
+
+
+    def insert(self, student_id, group_id, name, surname):
+        map_key_values = {
+            'id' : student_id,
+            'group_id' : group_id,
+            'name' : name,
+            'surname': surname
+        }
+        self.psql.insert(self.TABLE_NAME, map_key_values)
 
     def clear(self):
         self.psql.drop_table(self.TABLE_NAME)

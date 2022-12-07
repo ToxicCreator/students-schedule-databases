@@ -6,11 +6,9 @@ sys.path.append(parentdir)
 from table import Table
 import random
 import redis
-from neo4j_db.graph import Graph
 
 # docker run -d --name redis-cnt -p 6379:6379 redis
 class Students(Table):
-    __shifrs = set()
 
     def __init__(self, host, port, clear=False):
         self.redis_db = redis.Redis(
@@ -24,11 +22,6 @@ class Students(Table):
         if clear:
             self.clear()
 
-
-    def get_shifrs(self):
-        return self.__shifrs
-
-
     def read(self, key):
         return self.redis_db.hgetall(key)
 
@@ -36,8 +29,7 @@ class Students(Table):
         key = self.__get_shifr()
         self.redis_db.hset(key, 'name', name)
         self.redis_db.hset(key, 'surname', surname)
-        self.redis_db.hset(key, 'groupID', group_name)
-        # self.graph.create_student_node(key, name, group_name)
+        self.redis_db.hset(key, 'group_id', group_name)
         return key
 
 
@@ -49,7 +41,6 @@ class Students(Table):
         keys = self.redis_db.keys()
         for key in keys:
             self.redis_db.delete(key)
-
 
     def __get_shifr(self):
         letters = "БСБОКМПФРСГУДИЭХТВ"
@@ -64,7 +55,7 @@ class Students(Table):
         keys = self.redis_db.keys()
         for key in keys:
             student = self.read(key)
-            if student['group_name'] == group_name:
+            if student['group_id'] == group_name:
                 group.append(key)
         return group
 

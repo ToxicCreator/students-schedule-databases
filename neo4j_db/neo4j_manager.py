@@ -10,12 +10,6 @@ class Neo4jManager(metaclass = MetaSingleton):
             auth = (login, password)
         )
         self.session = self.database.session()
-        # try:
-        #     database.session().run("Match () return 1 Limit 1")
-        #     return database
-        # except:
-        #     print("\nFailed to connect to Neo4J")
-        #     sys.exit()
 
     def create_node(self, label, parameters):
         query = f'''

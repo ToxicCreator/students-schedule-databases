@@ -6,14 +6,14 @@ parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
 
 import random
-# from neo4j_db.graph import Graph
 from mongo.institutes import Institutes
 from postgresql.schedule import Schedule
 from postgresql.groups import Groups
 from postgresql.lessons import Lessons
 from elastic.descriptions import Descriptions
-from redis_db.students import Students
 from postgresql.visits import Visits
+import redis_db.students
+import postgresql.students
 from names import get_first_name, get_last_name
 from utils import parse_data, check_chance, generate_group_name, get_lesson_date, get_foreign_courses
 
@@ -23,9 +23,6 @@ TYPES = [
 ]
 
 def fill():
-    # graph = Graph()
-    # graph.clear()
-
     institutes = __fill_institutes()
 
     groups = __fill_groups(institutes.get_specialities_codes())
@@ -54,9 +51,9 @@ def __fill_lessons(courses_id: list):
 
     for id in courses_id:
         for lection_num in range(1, 9):
-            lessons.insert(TYPES[0], id, "qwe") #descriprions.insert()
+            lessons.insert(TYPES[0], id, "descriprions.insert()")
         for practic_num in range(1, 17):
-            lessons.insert(TYPES[1], id, "qwe") #descriprions.insert()
+            lessons.insert(TYPES[1], id, "descriprions.insert()")
     
     return lessons
 
@@ -114,14 +111,18 @@ def __fill_schedule(institutes, lessons, groups):
 
 def __fill_students(groups, min = 10, max = 30):
     settings = parse_data('settings.json')
-    students = Students(settings["host"], settings["redis"]["port"], clear=True)
+    redis_students = redis_db.students.Students(settings["host"], settings["redis"]["port"], clear=True)
+    postgres_students = postgresql.students.Students(clear=True)
     groups_students = {}
     for group in groups:
         group_name = group[0]
         groups_students[group_name] = []
         for i in range(random.randint(min, max)):
-            student = students.insert(name=get_first_name(), surname=get_last_name(), group_name=group_name)
+            name = get_first_name()
+            surname = get_last_name()
+            student = redis_students.insert(name=name, surname=surname, group_name=group_name)
             groups_students[group_name].append(student)
+            postgres_students.insert(student, group_name, name, surname)
     return groups_students
 
 def __fill_visits(groups_schedule, groups_students):
