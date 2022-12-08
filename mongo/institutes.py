@@ -13,7 +13,6 @@ sys.path.append(parentdir)
 database_name = 'prac_3'
 collection_name = 'institutes'
 
-
 class Institutes:
     institutes: dict
     def __init__(self, clear=False):
@@ -29,26 +28,10 @@ class Institutes:
         self.institutes = parse_data(path)
 
     def fill(self):
-        # for institute in institutes:
-        #     self.graph.create_institute_node(institute['name'])
-        #     for department in institute['departments']:
-        #         self.graph.create_department_node(department['name'], institute['name'])
-        #         for speciality in department['specialities']:
-        #             code = speciality['code']
-        #             name = speciality['name']
-        #             self.graph.create_speciality_node(code, name, department['name'])
-
         if isinstance(self.institutes, list):
             self.collection.insert_many(self.institutes)
         else:
             self.collection.insert_one(self.institutes)
-
-        # courses = self.__parse_data('mongo\courses.json')
-        # cut = random.randint(1, len(courses))
-        # self.collection.update_many(
-        #     {},
-        #     [{ '$set': { 'departments.specialities.courses': courses[:cut] } }]
-        # )
 
     def make_neo4j_shortcuts(self):
         for institute in self.institutes:
@@ -61,8 +44,6 @@ class Institutes:
                 for course in department['Courses']:
                     self.graph.create_course_node(name=course['Name'],
                                                   department_name=department['Name'])
-
-
 
     def get_specialities_codes(self):
         codes = []

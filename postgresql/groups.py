@@ -2,7 +2,6 @@ import os
 import sys
 from table import Table
 from postgresql.psql_manager import PsqlManager
-from neo4j_db.graph import Graph
 from utils import parse_data
 
 currentdir = os.path.dirname(os.path.realpath(__file__))
@@ -17,6 +16,7 @@ class Groups(Table):
         self.psql = PsqlManager(settings["host"], settings["postgresql"]["port"], 
                                 settings["postgresql"]["login"], settings["postgresql"]["password"])
         self.graph = Graph()
+        
         if clear:
             self.clear()
         self.create_table()
@@ -39,10 +39,6 @@ class Groups(Table):
         self.graph.create_group_node(name=name,
                                      spec_code=speciality_id)
         return name
-        # if self.psql.insert(self.TABLE_NAME, values):
-        #     self.graph.create_group_node(name, code)
-        #     return name
-        # return False
 
     def read(self, name) -> tuple:
         query = f'''

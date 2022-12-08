@@ -19,6 +19,7 @@ class Lessons(Table):
         self.psql = PsqlManager(settings["host"], settings["postgresql"]["port"], 
                                 settings["postgresql"]["login"], settings["postgresql"]["password"])
         self.graph = Graph()
+        
         if clear:
             self.clear()
         self.create_table()

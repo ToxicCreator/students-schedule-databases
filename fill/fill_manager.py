@@ -12,8 +12,9 @@ from postgresql.schedule import Schedule
 from postgresql.groups import Groups
 from postgresql.lessons import Lessons
 from elastic.descriptions import Descriptions
-from redis_db.students import Students
 from postgresql.visits import Visits
+import redis_db.students
+import postgresql.students
 from names import get_first_name, get_last_name
 from utils import parse_data, check_chance, generate_group_name, get_lesson_date, get_foreign_courses
 
@@ -23,8 +24,6 @@ TYPES = [
 ]
 
 def fill():
-    # graph = Graph()
-    # graph.clear()
     institutes = __fill_institutes()
     groups = __fill_groups(institutes.get_specialities_codes())
     lessons = __fill_lessons(institutes.get_courses_ids(), institutes)
@@ -54,10 +53,9 @@ def __fill_lessons(courses_id: list, institutes):
     descriptions = Descriptions()
     for i in range(len(courses_id)):
         for lection_num in range(1, 9):
-            lessons.insert(TYPES[0], courses_id[i], courses_names[i], "qwe") #descriptions.insert()
+            lessons.insert(TYPES[0], id, "descriprions.insert()")
         for practic_num in range(1, 17):
-            lessons.insert(TYPES[1], courses_id[i], courses_names[i], "qwe") #descriptions.insert()
-    
+            lessons.insert(TYPES[1], id, "descriprions.insert()")
     return lessons
 
 def __fill_schedule(institutes, lessons, groups):
@@ -116,18 +114,24 @@ def __fill_schedule(institutes, lessons, groups):
 def __fill_students(groups, schedule, lessons, institutes, min=10, max=30):
     graph = Graph()
     settings = parse_data('settings.json')
-    students = Students(settings["host"], settings["redis"]["port"], clear=True)
+    redis_students = redis_db.students.Students(settings["host"], settings["redis"]["port"], clear=True)
+    postgres_students = postgresql.students.Students(clear=True)
     groups_students = {}
     for group in groups:
         group_name = group[0]
         groups_students[group_name] = []
         for i in range(random.randint(min, max)):
-            student = students.insert(name=get_first_name(), surname=get_last_name(), group_name=group_name)
+            name = get_first_name()
+            surname = get_last_name()
+            student = redis_students.insert(name=name, surname=surname, group_name=group_name)
             groups_students[group_name].append(student)
+            postgres_students.insert(student, group_name, name, surname)
+            
         lesson_ids = [lesson[0] for lesson in schedule.read_lessons_by_group(group_name)]
         courses = [course[0] for course in lessons.read_by_lesson_ids(lesson_ids)]
         course_names = institutes.get_course_names_by_ids(courses)
         graph.create_student_course_tie(group_name=group_name, course_names=course_names)
+        
     return groups_students
 
 
