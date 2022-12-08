@@ -70,7 +70,7 @@ class Lessons(Table):
         self.psql.execute_and_commit(query)
         return self.psql.cursor.fetchall()
         
-    def read_by_lesson_ids(self, lesson_ids):
+    def read_courses_by_lesson_ids(self, lesson_ids):
         query = f'''
                    SELECT DISTINCT course_id FROM {self.TABLE_NAME} 
                    WHERE id = {' OR id = '.join([str(lesson) for lesson in lesson_ids])} 

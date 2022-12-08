@@ -29,8 +29,7 @@ def fill():
     lessons = __fill_lessons(institutes.get_courses_ids(), institutes)
     schedule, groups_schedule = __fill_schedule(institutes, lessons, groups)
     groups_students = __fill_students(groups.read_all_ids(), schedule, lessons, institutes)
-    __fill_visits(groups_schedule, groups_students)
-
+    # __fill_visits(groups_schedule, groups_students)
 
 def __fill_institutes():
     institutes = Institutes(clear=True)
@@ -53,9 +52,9 @@ def __fill_lessons(courses_id: list, institutes):
     descriptions = Descriptions()
     for i in range(len(courses_id)):
         for lection_num in range(1, 9):
-            lessons.insert(TYPES[0], id, "descriprions.insert()")
+            lessons.insert(TYPES[0], courses_id[i], courses_names[i], "qwe")
         for practic_num in range(1, 17):
-            lessons.insert(TYPES[1], id, "descriprions.insert()")
+            lessons.insert(TYPES[1], courses_id[i], courses_names[i], "qwe")
     return lessons
 
 def __fill_schedule(institutes, lessons, groups):
@@ -111,7 +110,7 @@ def __fill_schedule(institutes, lessons, groups):
     return schedule, groups_schedule
 
 
-def __fill_students(groups, schedule, lessons, institutes, min=10, max=30):
+def __fill_students(groups, schedule, lessons, institutes, min=15, max=30):
     graph = Graph()
     settings = parse_data('settings.json')
     redis_students = redis_db.students.Students(settings["host"], settings["redis"]["port"], clear=True)
@@ -126,12 +125,11 @@ def __fill_students(groups, schedule, lessons, institutes, min=10, max=30):
             student = redis_students.insert(name=name, surname=surname, group_name=group_name)
             groups_students[group_name].append(student)
             postgres_students.insert(student, group_name, name, surname)
-            
         lesson_ids = [lesson[0] for lesson in schedule.read_lessons_by_group(group_name)]
-        courses = [course[0] for course in lessons.read_by_lesson_ids(lesson_ids)]
+        courses = [course[0] for course in lessons.read_courses_by_lesson_ids(lesson_ids)]
         course_names = institutes.get_course_names_by_ids(courses)
         graph.create_student_course_tie(group_name=group_name, course_names=course_names)
-        
+        graph.create_student_lesson_tie(group_name=group_name)
     return groups_students
 
 

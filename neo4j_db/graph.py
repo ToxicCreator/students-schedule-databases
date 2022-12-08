@@ -8,9 +8,6 @@ sys.path.append(parentdir)
 from neo4j_db.neo4j_manager import Neo4jManager
 from utils import parse_data
 
-
-
-
 class Graph:
     def __init__(self):
         settings = parse_data('settings.json')
@@ -98,6 +95,13 @@ class Graph:
         return self.client.execute(query, {
             'Id': lesson_id
         }).single()
+
+    def create_student_lesson_tie(self, group_name):
+        query = f'''
+                MATCH (g:group {{Name: '{group_name}'}})<-[:member]-(st:student)
+                MATCH (st)-[:studying]->(c:course)<-[:part_of]-(l:lesson) WITH c.Name AS cname, st, c, l 
+                CREATE (st)-[cr:visits_by_course {{Name: cname}}]->(l)'''
+        self.client.execute(query, {}).single()
 
 
     def clear(self):

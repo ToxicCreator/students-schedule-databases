@@ -33,6 +33,7 @@ class Descriptions:
 
     def insert(self):
         materials = self.get_random_materials()
+        print(materials)
         equip = Descriptions.get_random_equipment()
         return self.manager.create_document(
             self.INDEX_NAME,
