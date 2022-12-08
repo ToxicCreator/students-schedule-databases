@@ -18,7 +18,7 @@ sys.path.append(parentdir)
 EQUIPMENT = ["компьютер", "проектор", "маркерная доска", "флеш-накопитель", "смарт-токен", "сетевой шкаф", "кликер",
              "набор маркеров", "проекционная доска", "чертежные наборы", "образ виртуальной машины kali linux"]
 
-class Descriptions():
+class Descriptions:
     TABLE_NAME = 'description'
     INDEX_NAME = 'lessons'
 

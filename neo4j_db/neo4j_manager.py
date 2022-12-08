@@ -6,8 +6,9 @@ class Neo4jManager(metaclass = MetaSingleton):
 
     def __init__(self, host, port, login, password):
         self.database = GraphDatabase.driver(
-            uri = "bolt://{0}:{1}".format(host, port),
-            auth = (login, password)
+            uri="bolt://{0}:{1}".format(host, port),
+            auth=(login, password),
+            max_connection_pool_size=100000
         )
         self.session = self.database.session()
 
@@ -19,7 +20,7 @@ class Neo4jManager(metaclass = MetaSingleton):
         '''
         return self.execute(query, parameters).single()[0]
 
-    def create_merge(self, from_, to, label = ''):
+    def create_merge(self, from_, to, label=''):
         query = f'''
             MATCH (from) WITH from
             MATCH (to)

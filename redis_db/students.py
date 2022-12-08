@@ -30,6 +30,8 @@ class Students(Table):
         self.redis_db.hset(key, 'name', name)
         self.redis_db.hset(key, 'surname', surname)
         self.redis_db.hset(key, 'group_id', group_name)
+        self.graph.create_student_node(recordbook=key,
+                                       group_name=group_name)
         return key
 
 
