@@ -1,0 +1,89 @@
+# docker-compose.yml
+
+name: "schedule_services"
+services:
+  main_hub:
+    container_name: "MainHub"
+    image: "main_hub:1.0.0"
+    build: ./services/MainHub
+    command: python main.py
+    volumes:
+      - ./services/MainHub:/app
+    ports:
+      - 9000:9000
+    networks:
+      services-network:
+        ipv4_address: 10.5.0.10
+  
+  mongo_service:
+    container_name: "MongoService"
+    image: "mongo_service:1.0.0"
+    build: ./services/MongoService
+    command: python main.py
+    volumes:
+      - ./services/MongoService:/app
+    ports:
+      - 9001:9001
+    networks:
+      services-network:
+        ipv4_address: 10.5.0.11
+  
+  neo4j_service:
+    container_name: "Neo4jService"
+    image: "neo4j_service:1.0.0"
+    build: ./services/Neo4jService
+    command: python main.py
+    volumes:
+      - ./services/Neo4jService:/app
+    ports:
+      - 9002:9002
+    networks:
+      services-network:
+        ipv4_address: 10.5.0.12
+  
+  redis_service:
+    container_name: "RedisService"
+    image: "redis_service:1.0.0"
+    build: ./services/RedisService
+    command: python main.py
+    volumes:
+      - ./services/RedisService:/app
+    ports:
+      - 9003:9003
+    networks:
+      services-network:
+        ipv4_address: 10.5.0.13
+  
+  elastic_service:
+    container_name: "ElasticService"
+    image: "elastic_service:1.0.0"
+    build: ./services/ElasticService
+    command: python main.py
+    volumes:
+      - ./services/ElasticService:/app
+    ports:
+      - 9004:9004
+    networks:
+      services-network:
+        ipv4_address: 10.5.0.14
+  
+  pgsql_service:
+    container_name: "PostgreSqlService"
+    image: "pgsql_service:1.0.0"
+    build: ./services/PostgreSqlService
+    command: python main.py
+    volumes:
+      - ./services/PostgreSqlService:/app
+    ports:
+      - 9005:9005
+    networks:
+      services-network:
+        ipv4_address: 10.5.0.15
+
+networks:
+    services-network:
+      driver: bridge
+      ipam:
+        config:
+          - subnet: 10.5.0.0/16
+            gateway: 10.5.0.1
