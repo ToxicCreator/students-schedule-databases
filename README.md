@@ -2,7 +2,7 @@
 ## Docker Compose
 Чтобы собрать и запустить docker compose нужно выполнить следующую команду:
 ```sh
-docker-compose up -d --build
+docker-compose --env-file ./.env up -d --build
 ```
 ## IP контейнеров:
 MainHub - `10.5.0.10:9000`

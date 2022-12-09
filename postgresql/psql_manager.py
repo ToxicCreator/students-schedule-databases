@@ -18,12 +18,15 @@ class PsqlManager(metaclass = MetaSingleton):
         )
         self.cursor = self.connection.cursor()
 
+
     def __del__(self):
         self.connection.close()
+
 
     def execute_and_commit(self, query: str) -> None:
         self.cursor.execute(query)
         self.connection.commit()
+
 
     def check_table_exist(self, table_name: str) -> bool:
         query = f'''
@@ -36,6 +39,7 @@ class PsqlManager(metaclass = MetaSingleton):
         self.execute_and_commit(query)
         return not (self.cursor.rowcount == 0)
 
+
     def insert(self, table_name: str, map_key_values) -> tuple:
         query = f'INSERT INTO {table_name}'
         query += self.__get_query_insert_arguments(map_key_values)
@@ -45,6 +49,7 @@ class PsqlManager(metaclass = MetaSingleton):
         self.execute_and_commit(query)
         return self.cursor.fetchone()
 
+
     @staticmethod
     def __get_query_insert_arguments(map_key_values: dict) -> str:
         query = f' ({", ".join(map_key_values.keys())})'
@@ -53,6 +58,7 @@ class PsqlManager(metaclass = MetaSingleton):
         values = map_key_values.values()
         query += f''' VALUES ('{"', '".join(values)}\')'''
         return query
+
 
     @staticmethod
     def __get_query_where_arguments(map_key_values: dict) -> str:
@@ -64,18 +70,21 @@ class PsqlManager(metaclass = MetaSingleton):
         query += ' AND '.join(arguments)
         return query
 
+
     def select_all(self, table_name: str) -> list:
         query = f'''
-      SELECT * FROM {table_name}
-    '''
+            SELECT * FROM {table_name}
+        '''
         self.execute_and_commit(query)
         return self.cursor.fetchall()
+
 
     def clear_table(self, table_name: str) -> None:
         if not self.check_table_exist(table_name):
             return
         query = f'TRUNCATE {table_name};'
         self.execute_and_commit(query)
+
 
     def drop_table(self, table_name: str) -> None:
         query = f'DROP TABLE IF EXISTS {table_name} CASCADE;'

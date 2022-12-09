@@ -17,8 +17,8 @@ class RedisManager():
 
     def __make_connection(self):
         self.__database = redis.Redis(
-            host=os.getenv("redis_host"),
-            port=os.getenv("redis_port"),
+            host=os.getenv("redis_host", "localhost"),
+            port=int(os.getenv("redis_port", 6379)),
             db=0,
             charset='UTF-8',
             decode_responses=True
@@ -28,3 +28,7 @@ class RedisManager():
     def retry_connection(self):
         self.__make_connection()
         return self.check_connection()
+
+
+    def read(self, key):
+        return self.__database.hgetall(key)
