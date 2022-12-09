@@ -29,7 +29,7 @@ def fill():
     lessons = __fill_lessons(institutes.get_courses_ids(), institutes)
     schedule, groups_schedule = __fill_schedule(institutes, lessons, groups)
     groups_students = __fill_students(groups.read_all_ids(), schedule, lessons, institutes)
-    # __fill_visits(groups_schedule, groups_students)
+    __fill_visits(groups_schedule, groups_students)
 
 def __fill_institutes():
     institutes = Institutes(clear=True)
