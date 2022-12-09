@@ -10,10 +10,10 @@ services:
     volumes:
       - ./services/MainHub:/app
     ports:
-      - 9000:9000
+      - ${MAIN_HUB_PORT}:${MAIN_HUB_PORT}
     networks:
       services-network:
-        ipv4_address: 10.5.0.10
+        ipv4_address: ${MAIN_HUB_IP}
   
   mongo_service:
     container_name: "MongoService"
@@ -23,10 +23,10 @@ services:
     volumes:
       - ./services/MongoService:/app
     ports:
-      - 9001:9001
+      - ${MONGO_PORT}:${MONGO_PORT}
     networks:
       services-network:
-        ipv4_address: 10.5.0.11
+        ipv4_address: ${MONGO_IP}
   
   neo4j_service:
     container_name: "Neo4jService"
@@ -36,10 +36,10 @@ services:
     volumes:
       - ./services/Neo4jService:/app
     ports:
-      - 9002:9002
+      - ${NEO4J_PORT}:${NEO4J_PORT}
     networks:
       services-network:
-        ipv4_address: 10.5.0.12
+        ipv4_address: ${NEO4J_IP}
   
   redis_service:
     container_name: "RedisService"
@@ -49,10 +49,10 @@ services:
     volumes:
       - ./services/RedisService:/app
     ports:
-      - 9003:9003
+      - ${REDIS_PORT}:${REDIS_PORT}
     networks:
       services-network:
-        ipv4_address: 10.5.0.13
+        ipv4_address: ${REDIS_IP}
   
   elastic_service:
     container_name: "ElasticService"
@@ -62,10 +62,10 @@ services:
     volumes:
       - ./services/ElasticService:/app
     ports:
-      - 9004:9004
+      - ${ELASTIC_PORT}:${ELASTIC_PORT}
     networks:
       services-network:
-        ipv4_address: 10.5.0.14
+        ipv4_address: ${ELASTIC_IP}
   
   pgsql_service:
     container_name: "PostgreSqlService"
@@ -75,15 +75,15 @@ services:
     volumes:
       - ./services/PostgreSqlService:/app
     ports:
-      - 9005:9005
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
     networks:
       services-network:
-        ipv4_address: 10.5.0.15
+        ipv4_address: ${POSTGRES_IP}
 
 networks:
     services-network:
       driver: bridge
       ipam:
         config:
-          - subnet: 10.5.0.0/16
-            gateway: 10.5.0.1
+          - subnet: ${DOCKER_SUBNET}
+            gateway: ${DOCKER_GATEWAY}
