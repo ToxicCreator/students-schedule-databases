@@ -40,6 +40,7 @@ class PsqlManager():
         self.__connection.close()
 
 
-    def execute_and_commit(self, query: str) -> None:
+    def execute_and_commit(self, query: str):
         self.__cursor.execute(query)
         self.__connection.commit()
+        return self.__cursor.fetchall()
