@@ -1,8 +1,10 @@
-from fastapi import FastAPI
 import uvicorn
+from fastapi import FastAPI
+from psql_manager import PsqlManager
+
 
 app = FastAPI()
-
+manager = PsqlManager()
 
 @app.get('/')
 async def index():

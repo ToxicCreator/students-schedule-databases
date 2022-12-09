@@ -1,9 +1,9 @@
-# app/main.py
-
-from fastapi import FastAPI
-import os
 import uvicorn
+from fastapi import FastAPI
+from mongo_manager import MongoManager
+
 app = FastAPI()
+manager = MongoManager("microservices")
 
 
 @app.get('/')
