@@ -4,6 +4,7 @@ currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
 from table import Table
+from neo4j_db.graph import Graph
 import random
 import redis
 

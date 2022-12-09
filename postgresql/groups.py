@@ -3,6 +3,7 @@ import sys
 from table import Table
 from postgresql.psql_manager import PsqlManager
 from utils import parse_data
+from neo4j_db.graph import Graph
 
 currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
