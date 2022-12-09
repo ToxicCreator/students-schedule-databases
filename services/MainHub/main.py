@@ -36,7 +36,7 @@ async def index():
 
 
 @app.get('/make-first-request')
-def makeFirstRequest(start, end, term: str):
+def makeFirstRequest(start: str, end: str, term: str):
     lessons_id = get_lessons_id_by_description(term)
     (students_id, percentage_of_visits) = get_percentage_of_visits(
         lessons_id, 
@@ -81,4 +81,4 @@ def get_students(students_id):
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=9000)
+    uvicorn.run(app, host="0.0.0.0", port=os.getenv('MAIN_HUB_PORT'))

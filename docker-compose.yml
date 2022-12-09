@@ -14,6 +14,8 @@ services:
     networks:
       services-network:
         ipv4_address: ${MAIN_HUB_IP}
+    env_file:
+      - .env
   
   mongo_service:
     container_name: "MongoService"
@@ -27,6 +29,8 @@ services:
     networks:
       services-network:
         ipv4_address: ${MONGO_IP}
+    environment:
+      - MONGO_PORT=${MONGO_PORT}
   
   neo4j_service:
     container_name: "Neo4jService"
@@ -40,6 +44,8 @@ services:
     networks:
       services-network:
         ipv4_address: ${NEO4J_IP}
+    environment:
+      - NEO4J_PORT=${NEO4J_PORT}
   
   redis_service:
     container_name: "RedisService"
@@ -53,6 +59,8 @@ services:
     networks:
       services-network:
         ipv4_address: ${REDIS_IP}
+    environment:
+      - REDIS_PORT=${REDIS_PORT}
   
   elastic_service:
     container_name: "ElasticService"
@@ -66,6 +74,8 @@ services:
     networks:
       services-network:
         ipv4_address: ${ELASTIC_IP}
+    environment:
+      - ELASTIC_PORT=${ELASTIC_PORT}
   
   pgsql_service:
     container_name: "PostgreSqlService"
@@ -79,6 +89,8 @@ services:
     networks:
       services-network:
         ipv4_address: ${POSTGRES_IP}
+    environment:
+      - POSTGRES_PORT=${POSTGRES_PORT}
 
 networks:
     services-network:
