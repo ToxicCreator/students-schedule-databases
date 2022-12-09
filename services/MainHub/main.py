@@ -49,8 +49,15 @@ def makeSecondRequest():
 
 
 @app.get('/make-third-request')
-def makeThirdRequest():
-    pass
+def makeThirdRequest(group_id):
+    lessons = get_group_lessons_by_id(group_id)
+    filtered_lessons = get_filtered_lessons_by_department(group_id, lessons)
+    studying_info = get_studying_info(group_id, filtered_lessons)
+    students_info = get_students_info(student_ids)
+    group_info = get_group_info_by_id(group_id)
+    courses_info = get_courses_info(course_ids)
+    return generate_third_request_response_json()
+
 
 
 def get_lessons_id_by_description(term: str):
@@ -76,6 +83,29 @@ def get_students(students_id):
         "students_id": students_id
     })
 
+def get_group_lessons_by_id(group_id):
+    url = postgres_url + 'group_lessons_by_id'
+    return requests.get(url, params={
+        'group_id': group_id
+    })
+
+def get_filtered_lessons_by_department(group_id, lessons):
+    pass
+
+def get_studying_info(group_id, filtered_lessons):
+    pass
+
+def get_students_info(student_ids):
+    pass
+
+def get_group_info_by_id(group_id):
+    pass
+
+def get_courses_info(course_ids):
+    pass
+
+def generate_third_request_response_json():
+    pass
 
 if __name__ == "__main__":
     port = int(os.getenv('MAIN_HUB_PORT', 9000))
