@@ -58,9 +58,12 @@ def makeThirdRequest():
 
 def get_lessons_id_by_description(term: str):
     url = elastic_ip + 'description'
-    return requests.get(url, params={
-        'term': term
-    })
+    return requests.get(
+        url=url, 
+        params={
+            'term': term
+        }
+    )
 
 
 def get_percentage_of_visits(lessons_id, start, end):
@@ -70,12 +73,12 @@ def get_percentage_of_visits(lessons_id, start, end):
         'start': start,
         'end': end
     }
-    return requests.post(url, json=postgres_body)
+    return requests.post(url=url, json=postgres_body)
 
 
 def get_students(students_id):
     url = redis_url + 'students'
-    return requests.post(url, json={
+    return requests.post(url=url, json={
         "students_id": students_id
     })
 
