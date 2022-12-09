@@ -82,7 +82,8 @@ async def lessons_data_by_semester(semester: int, year: int):
     '''
 
     self.psql.execute_and_commit(query)
-    self.psql.cursor.fetchall()
+    return self.psql.cursor.fetchall()
+
 
 
 if __name__ == "__main__":

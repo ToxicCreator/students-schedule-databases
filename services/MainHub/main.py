@@ -1,9 +1,12 @@
 
 import os
+import json
 from dotenv import load_dotenv
 from fastapi import FastAPI
 import uvicorn
 import requests
+from SecondRequestAnswer import SecondRequestAnswer
+
 
 
 app = FastAPI()
@@ -64,19 +67,31 @@ def get_data_by_semester(semester: int, year: int):
 
 
 def get_students_count_by_groups_is(groups_id: list):
-    pass
+    url = neo4j_url + 'count_of_students'
+    postgres_body = {
+        'groups_id': groups_id
+    }
+    return requests.post(url, json=postgres_body)
 
 
 def get_courses_info(courses_id: list):
-    pass
+    url = mongo_url + 'course_info'
+    postgres_body = {
+        'courses_id': courses_id
+    }
+    return requests.post(url, json=postgres_body)
 
 
 @app.get('/make-second-request')
 def makeSecondRequest(semester: int, year: int):
     lessons_id, courses_id, groups_id = get_data_by_semester(semester, year)
     student_count = get_students_count_by_groups_is(groups_id)
-    couses_info = get_courses_info(courses_id)
+    courses_info = get_courses_info(courses_id)
+    answer = []
+    for i in range(len(lessons_id)):
+        answer.append(SecondRequestAnswer(lessons_id[i], courses_info[i], student_count[i]))
 
+    return json.dumps(answer.__dict__)
 
 @app.get('/make-third-request')
 def makeThirdRequest():
