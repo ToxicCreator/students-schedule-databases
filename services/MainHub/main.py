@@ -1,8 +1,12 @@
 
 import os
+import json
+from dotenv import load_dotenv
 from fastapi import FastAPI
 import uvicorn
 from first_request import makeFirstRequest
+from SecondRequestAnswer import SecondRequestAnswer
+
 
 
 app = FastAPI()
@@ -27,9 +31,15 @@ def makeFirstRequest(start: str, end: str, term: str):
 
 
 @app.get('/make-second-request')
-def makeSecondRequest():
-    pass
+def makeSecondRequest(semester: int, year: int):
+    lessons_id, courses_id, groups_id = get_data_by_semester(semester, year)
+    student_count = get_students_count_by_groups_is(groups_id)
+    courses_info = get_courses_info(courses_id)
+    answer = []
+    for i in range(len(lessons_id)):
+        answer.append(SecondRequestAnswer(lessons_id[i], courses_info[i], student_count[i]))
 
+    return json.dumps(answer.__dict__)
 
 @app.get('/make-third-request')
 def makeThirdRequest():

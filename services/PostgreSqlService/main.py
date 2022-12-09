@@ -38,7 +38,31 @@ async def percentage_of_visits(body: PercentageOfVisitsParams):
         ORDER BY percentage_of_visits LIMIT 10;
     '''
     query = 'SELECT * FROM visits;'
-    return manager.execute_and_commit(query)
+    return execute_and_commit(query)
+
+@app.post('/lessons_data_by_semester')
+async def lessons_data_by_semester(semester: int, year: int):
+    if semester not in [1, 2]:
+        return
+
+    if semester == 1:
+        start_date = f'{year}-09-01'
+        finish_date = f'{year}-12-31'
+
+    if semester == 2:
+        start_date = f'{year+1}-01-01'
+        finish_date = f'{year}-07-1'
+
+    query = f'''
+    SELECT les.id, sch.course_id, sch.group_id FROM schedule sch 
+    WHERE sch.date BETWEEN {start_date} AND {finish_date} 
+    JOIN groups gr ON gr.id = sch.group_id
+    JOIN lessons les ON les.id = sch.lessons_id
+    '''
+
+    self.psql.execute_and_commit(query)
+    return self.psql.cursor.fetchall()
+
 
 
 if __name__ == "__main__":
