@@ -23,3 +23,20 @@ class ElasticManager():
     def retry_connection(self):
         self.__make_connection()
         return self.check_connection()
+
+
+    def read_query(self, index, query_map: dict[str, str]):
+        return self.searh_by_map(index, query_map).execute()
+
+
+    def searh_by_map(self, index, query_map: dict[str, str]):
+        search = Search(using = self.__client, index = index)
+        for key, value in query_map.items():
+            search.query = Q(
+                'bool',
+                should = [Q('match', **{key: value})]
+            )
+        search.query(
+            minimum_should_match = len(query_map.values())
+        )
+        return search
