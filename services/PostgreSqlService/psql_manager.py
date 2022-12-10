@@ -35,10 +35,8 @@ class PsqlManager():
     def retry_connection(self):
         return self.__make_connection()
 
-
     def __del__(self):
         self.__connection.close()
-
 
     def execute_and_commit(self, query: str):
         self.__cursor.execute(query)

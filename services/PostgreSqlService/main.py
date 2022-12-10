@@ -1,19 +1,19 @@
 import os
 import uvicorn
-<<<<<<< HEAD
 from fastapi import FastAPI
 from pydantic import BaseModel
 from psql_manager import PsqlManager
-
-=======
-import psycopg2
->>>>>>> 9b54281 (Initial commit)
 
 app = FastAPI()
 manager = PsqlManager()
 
 @app.get('/')
 async def index():
+    return {
+        "PostgreSQL": {
+            "/percentage-of-visits": {}
+        }
+    }
     return {
         "PostgreSQL": {
             "/percentage-of-visits": {}
@@ -44,9 +44,21 @@ async def percentage_of_visits(body: PercentageOfVisitsParams):
     query = 'SELECT * FROM visits;'
     return manager.execute_and_commit(query)
 
-@app.get('group-lessons-by-id')
+@app.get('/group-lessons-by-id')
 def group_lessons_by_id(group_id):
-    pass
+    if manager.check_connection() != True:
+        if manager.retry_connection() != True:
+            return {}
+    return __get_group_lessons_by_id(group_id)
+
+
+def __get_group_lessons_by_id(group_id):
+    query = f'''
+        SELECT sh.lesson_id FROM group gr
+        JOIN shedule sh ON gr.id = sh.group_id
+        WHERE sh.group_id = '{group_id}'
+    '''
+    return manager.execute_and_commit()
 
 if __name__ == "__main__":
     port = int(os.getenv('POSTGRES_PORT', 5050))

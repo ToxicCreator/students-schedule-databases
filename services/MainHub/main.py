@@ -1,9 +1,5 @@
 
 import os
-<<<<<<< HEAD
-=======
-from dotenv import load_dotenv
->>>>>>> 440c1b2 (Feat: First Request)
 from fastapi import FastAPI
 import uvicorn
 from first_request import makeFirstRequest
@@ -24,6 +20,10 @@ postgres_url = f'https://{POSTGRES_IP}:{POSTGRES_PORT}/'
 REDIS_IP = os.getenv('REDIS_IP')
 REDIS_PORT = os.getenv('REDIS_PORT')
 redis_url = f'https://{REDIS_IP}:{REDIS_PORT}/'
+
+NEO4J_IP = os.getenv('NEO4J_IP')
+NEO4J_PORT = os.getenv('NEO4J_PORT')
+neo4j_url = f'https://{NEO4J_IP}:{NEO4J_PORT}/'
 
 
 @app.get('/')
@@ -46,7 +46,6 @@ def makeFirstRequest(start: str, end: str, term: str):
 @app.get('/make-second-request')
 def makeSecondRequest():
     pass
-
 
 @app.get('/make-third-request')
 def makeThirdRequest(group_id):
@@ -84,13 +83,18 @@ def get_students(students_id):
     })
 
 def get_group_lessons_by_id(group_id):
-    url = postgres_url + 'group_lessons_by_id'
+    url = postgres_url + 'group-lessons-by-id'
     return requests.get(url, params={
         'group_id': group_id
     })
 
 def get_filtered_lessons_by_department(group_id, lessons):
-    pass
+    url = neo4j_url + 'filtered-lessons_by-department'
+    postgres_body = {
+        'lessons': lessons,
+        'group_id': group_id
+    }
+    return requests.post(url, json=postgres_body)
 
 def get_studying_info(group_id, filtered_lessons):
     pass
