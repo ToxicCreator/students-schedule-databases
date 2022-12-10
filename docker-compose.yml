@@ -1,0 +1,25 @@
+# docker-compose.yml
+
+name: "schedule_services"
+services:
+  main_hub:
+    container_name: "MainHub"
+    image: "main_hub:1.0.0"
+    build: ./
+    command: python main.py
+    volumes:
+      - .:/app
+    ports:
+      - ${MAIN_HUB_PORT}:${MAIN_HUB_PORT}
+    networks:
+      services-network:
+        ipv4_address: ${MAIN_HUB_IP}
+    env_file:
+      - .env
+networks:
+    services-network:
+      driver: bridge
+      ipam:
+        config:
+          - subnet: ${DOCKER_SUBNET}
+            gateway: ${DOCKER_GATEWAY}

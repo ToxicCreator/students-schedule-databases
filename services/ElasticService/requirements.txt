@@ -1,0 +1,4 @@
+uvicorn
+fastapi
+elasticsearch
+elasticsearch_dsl

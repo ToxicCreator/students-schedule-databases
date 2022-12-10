@@ -1,218 +1,107 @@
 import os
 import sys
+from postgresql.psql_manager import PsqlManager
+from table import Table
+from neo4j_db.graph import Graph
+from utils import parse_data
+
 currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
 
-import random
-from faker import Faker
-from datetime import date
-from postgresql.psql_manager import PsqlManager
-from table import Table
-
-
 week_count = 53
 
 class Lessons(Table):
-  TABLE_NAME = 'lessons'
-  TYPES = {
-    'practica': 'Практика',
-    'lecture': 'Лекция',
-    'labaratory': 'Лабараторная'
-  }
-  NAMES = [
-    'Математический анализ',
-    'Физика',
-    'История',
-    'Технологии программирования',
-    'Линейная алгебра'
-  ]
+    TABLE_NAME = 'lessons'
 
-  def __init__(self):
-    self.psql = PsqlManager()
-    self.clear()
-    self.create_table()
-    self.create_partition()
+    def __init__(self, clear=False):
+        settings = parse_data('settings.json')
+        self.psql = PsqlManager(settings["host"], settings["postgresql"]["port"], 
+                                settings["postgresql"]["login"], settings["postgresql"]["password"])
+        self.graph = Graph()
+        
+        if clear:
+            self.clear()
+        self.create_table()
 
+    def create_table(self) -> None:
+        query = '''
+            DROP TYPE IF EXISTS lessType;
+            CREATE TYPE lessType AS ENUM ('Практика', 'Лекция');
+        '''
 
-  def __del__(self):
-    self.clear()
+        self.psql.execute_and_commit(query)
 
+        query = f'''
+            CREATE TABLE IF NOT EXISTS {self.TABLE_NAME} (
+                id SERIAL PRIMARY KEY NOT NULL,
+                type lessType NOT NULL,
+                course_id SMALLINT NOT NULL,
+                description_id VARCHAR(50) NOT NULL
+            );
+        '''
+        self.psql.execute_and_commit(query)
 
-  def get_types(self):
-    return self.TYPES
+    def insert(self, lesson_type, course_id, course_name, description_id):
+        values = {
+            'type': lesson_type,
+            'course_id': course_id,
+            'description_id': description_id
+        }
+        lesson_id = self.psql.insert(self.TABLE_NAME, values)[0]
+        self.graph.create_lesson_node(lesson_id, course_name)
+        return lesson_id
 
-  # CREATE TABLE IF NOT EXISTS lessons (
-  #   type VARCHAR(40) NOT NULL,
-  #   lesson_date TIMESTAMP NOT NULL,
-  #   name VARCHAR(70) NOT NULL
-  # ) PARTITION BY range(date_part('week', lesson_date));
+    def read(self, lesson_id) -> tuple:
+        query = f'''
+            SELECT * FROM {self.TABLE_NAME} 
+            WHERE id = {lesson_id}
+        '''
+        self.psql.execute_and_commit(query)
+        return self.psql.cursor.fetchone()
+    
 
-  # create table lessons1 partition of lessons for values from (1) to (2);
-  # create table lessons2 partition of lessons for values from (2) to (3);
+    def read_by_course_ids(self, course_ids):
+        query = f'''
+            SELECT id FROM {self.TABLE_NAME} 
+            WHERE course_id = {' OR course_id = '.join([str(course) for course in course_ids])} 
+            GROUP BY course_id, id
+        '''
+        self.psql.execute_and_commit(query)
+        return self.psql.cursor.fetchall()
+        
+    def read_by_lesson_ids(self, lesson_ids):
+        query = f'''
+                   SELECT DISTINCT course_id FROM {self.TABLE_NAME} 
+                   WHERE id = {' OR id = '.join([str(lesson) for lesson in lesson_ids])} 
+               '''
+        self.psql.execute_and_commit(query)
+        return self.psql.cursor.fetchall()
 
-  # insert into lessons select 'Лекция', '2022-01-03', 'Физика';
+    def update(self, lesson_id, name=False, lesson_type = False, course_id = False) -> None:
+        if lesson_type:
+            self.update_type(lesson_id, lesson_type)
+        if course_id:
+            self.update_course_id(lesson_id, lesson_type)
 
-  # update lessons set lesson_date = '2022-01-10' where name = 'Физика';
+    def update_type(self, lesson_id, lesson_type) -> None:
+        query = f'''
+            UPDATE {self.TABLE_NAME} set
+                type = '{lesson_type}'
+            WHERE id = {lesson_id}
+        '''
+        self.psql.execute_and_commit(query)
 
-  # select * from lessons;
+    def update_course_id(self, lesson_id, course_id) -> None:
+        query = f'''
+            UPDATE {self.TABLE_NAME} set
+                course_id = {course_id}
+            WHERE id = {lesson_id}
+        '''
+        self.psql.execute_and_commit(query)
 
-  def create_table(self):
-    query = f'''
-      CREATE TABLE IF NOT EXISTS {self.TABLE_NAME} (
-        id SERIAL PRIMARY KEY NOT NULL,
-        type VARCHAR(40) NOT NULL,
-        lesson_date TIMESTAMP NOT NULL,
-        name VARCHAR(70) NOT NULL
-      );
-    '''
-    self.psql.execute_and_commit(query)
+    def clear(self) -> None:
+        self.psql.drop_table(self.TABLE_NAME)
 
-
-  def create_partition(self):
-    for week_number in range (1, week_count):
-      part_name = f'{self.TABLE_NAME}{week_number}'
-      if week_number == 43:
-        print()
-      if self.psql.check_table_exist(part_name):
-        continue
-      query = f'''
-        CREATE TABLE IF NOT EXISTS {part_name} (
-          CHECK (date_part('week', lesson_date) = {week_number})
-        ) INHERITS ({self.TABLE_NAME});
-      '''
-      self.psql.execute_and_commit(query)
-      print(f'Create partition "{part_name}"')
-    self.create_partition_trigger()
-
-
-  def create_partition_trigger(self):
-    trigger_name = 'insertPartition'
-    trigger = f'''
-      CREATE OR REPLACE FUNCTION {trigger_name}()
-        RETURNS TRIGGER AS
-      $$
-      DECLARE
-        partition_name TEXT;
-      BEGIN
-        partition_name := format(
-          '{self.TABLE_NAME}%s', 
-          date_part('week', NEW.lesson_date)::integer
-        );
-        execute 'INSERT INTO ' || partition_name || ' VALUES (($1).*)' USING NEW;
-        RETURN null;
-      END;
-      $$
-      LANGUAGE 'plpgsql';
-    '''
-    self.psql.execute_and_commit(trigger)
-    query = f'''
-      CREATE OR REPLACE TRIGGER partitionInsert 
-      BEFORE INSERT ON {self.TABLE_NAME} 
-      FOR EACH ROW EXECUTE PROCEDURE {trigger_name}();
-    '''
-    self.psql.execute_and_commit(query)
-
-  def insert(self, type, date, name):
-    self.psql.insert(self.TABLE_NAME, {
-      'type': type,
-      'lesson_date': date,
-      'name': name
-    })
-
-
-  def read_by_id(self, id):
-    query = f'''
-      SELECT * FROM {self.TABLE_NAME} 
-      WHERE id = {id}
-    '''
-    self.psql.execute_and_commit(query)
-    return self.psql.cursor.fetchall()
-
-
-  def read(self, search):
-    query = f'''
-      SELECT * FROM {self.TABLE_NAME} 
-      WHERE type = '{search['type']}' 
-        AND lesson_date = '{search['lesson_date']}' 
-        AND name = '{search['name']}'
-    '''
-    self.psql.execute_and_commit(query)
-    return self.psql.cursor.fetchall()
-
-
-  def update(self, id, type=False, date=False, name=False):
-    if type: self.update_type(id, type)
-    if date: self.update_date(id, date)
-    if name: self.update_name(id, name)
-
-
-  def update_type(self, id, type):
-    query = f'''
-      UPDATE {self.TABLE_NAME} set
-        type = '{type}'
-      WHERE id = {id}
-    '''
-    self.psql.execute_and_commit(query)
-
-
-  def update_date(self, id, date):
-    query = f'''
-      UPDATE {self.TABLE_NAME} set
-        lesson_date = '{date}'
-      WHERE id = {id}
-    '''
-    self.psql.execute_and_commit(query)
-
-
-  def update_name(self, id, name):
-    query = f'''
-      UPDATE {self.TABLE_NAME} set
-        name = '{name}'
-      WHERE id = {id}
-    '''
-    self.psql.execute_and_commit(query)
-
-
-  def fill(self, count):
-    Faker.seed(0)
-    fake = Faker()
-    for _ in range(count):
-      random_type_key = random.choice(list(self.TYPES.keys()))
-      random_type = self.TYPES[random_type_key]
-      
-      random_date = fake.date_between(
-        date(2022, 1, 1), 
-        date(2022, 12, 31)
-      )
-
-      random_name = random.choice(self.NAMES)
-      
-      self.insert(random_type, random_date, random_name)
-
-
-  def clear(self):
-    for week_number in range (1, week_count):
-      self.psql.clear_table(f'{self.TABLE_NAME}{week_number}')
-    self.psql.clear_table(self.TABLE_NAME)
-
-
-  def print(self, id):
-    rows = self.read_by_id(id)
-    print('---------------------------')
-    for row in rows:
-      print('type =', row[1])
-      print('date =', row[2])
-      print('name =', row[3])
-      print('---------------------------')
-
-
-  def print_all(self):
-    rows = self.psql.select_all(self.TABLE_NAME)
-    print('Table:', self.TABLE_NAME)
-    print('---------------------------')
-    for row in rows:
-      print('type =', row[1])
-      print('date =', row[2])
-      print('name =', row[3])
-      print('---------------------------')
+    def get_course(self, course_id) -> tuple:
+        return self.read(course_id)[3]

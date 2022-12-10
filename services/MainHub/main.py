@@ -1,10 +1,32 @@
+
 import os
 import json
 from dotenv import load_dotenv
 from fastapi import FastAPI
 import uvicorn
+from first_request import makeFirstRequest
+from SecondRequestAnswer import SecondRequestAnswer
+
+
 
 app = FastAPI()
+load_dotenv()
+
+ELASTIC_IP = os.getenv('ELASTIC_IP')
+ELASTIC_PORT = os.getenv('ELASTIC_PORT')
+elastic_ip = f'https://{ELASTIC_IP}:{ELASTIC_PORT}/'
+
+POSTGRES_IP = os.getenv('POSTGRES_IP')
+POSTGRES_PORT = os.getenv('POSTGRES_PORT')
+postgres_url = f'https://{POSTGRES_IP}:{POSTGRES_PORT}/'
+
+REDIS_IP = os.getenv('REDIS_IP')
+REDIS_PORT = os.getenv('REDIS_PORT')
+redis_url = f'https://{REDIS_IP}:{REDIS_PORT}/'
+
+NEO4J_IP = os.getenv('NEO4J_IP')
+NEO4J_PORT = os.getenv('NEO4J_PORT')
+neo4j_url = f'https://{NEO4J_IP}:{NEO4J_PORT}/'
 
 
 @app.get('/')
