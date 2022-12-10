@@ -15,6 +15,11 @@ async def index():
             "/percentage-of-visits": {}
         }
     }
+    return {
+        "PostgreSQL": {
+            "/percentage-of-visits": {}
+        }
+    }
 
 
 class PercentageOfVisitsParams(BaseModel):
@@ -64,6 +69,21 @@ async def lessons_data_by_semester(semester: int, year: int):
     return self.psql.cursor.fetchall()
 
 
+@app.get('/group-lessons-by-id')
+def group_lessons_by_id(group_id):
+    if manager.check_connection() != True:
+        if manager.retry_connection() != True:
+            return {}
+    return __get_group_lessons_by_id(group_id)
+
+
+def __get_group_lessons_by_id(group_id):
+    query = f'''
+        SELECT sh.lesson_id FROM group gr
+        JOIN shedule sh ON gr.id = sh.group_id
+        WHERE sh.group_id = '{group_id}'
+    '''
+    return manager.execute_and_commit()
 
 if __name__ == "__main__":
     port = int(os.getenv('POSTGRES_PORT', 5050))
