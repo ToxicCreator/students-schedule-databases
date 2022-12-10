@@ -142,6 +142,22 @@ services:
     env_file:
       - .env
 
+  filler_service:
+    container_name: "Filler"
+    image: "filler_service:1.0.0"
+    build: ./services/Filler
+    tty: true
+    command: python main.py
+    volumes:
+      - ./services/Filler:/app
+    ports:
+      - ${FILLER_SERVICE_PORT}:${FILLER_SERVICE_PORT}
+    networks:
+      services-network:
+        ipv4_address: ${FILLER_SERVICE_IP}
+    env_file:
+      - .env
+
 networks:
     services-network:
       driver: bridge
