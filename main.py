@@ -1,13 +1,8 @@
-
 import os
 import json
 from dotenv import load_dotenv
 from fastapi import FastAPI
 import uvicorn
-from first_request import makeFirstRequest
-from SecondRequestAnswer import SecondRequestAnswer
-
-
 
 app = FastAPI()
 

@@ -5,10 +5,10 @@ services:
   main_hub:
     container_name: "MainHub"
     image: "main_hub:1.0.0"
-    build: ./services/MainHub
+    build: ./
     command: python main.py
     volumes:
-      - ./services/MainHub:/app
+      - .:/app
     ports:
       - ${MAIN_HUB_PORT}:${MAIN_HUB_PORT}
     networks:
@@ -16,82 +16,6 @@ services:
         ipv4_address: ${MAIN_HUB_IP}
     env_file:
       - .env
-  
-  mongo_service:
-    container_name: "MongoService"
-    image: "mongo_service:1.0.0"
-    build: ./services/MongoService
-    command: python main.py
-    volumes:
-      - ./services/MongoService:/app
-    ports:
-      - ${MONGO_PORT}:${MONGO_PORT}
-    networks:
-      services-network:
-        ipv4_address: ${MONGO_IP}
-    environment:
-      - MONGO_PORT=${MONGO_PORT}
-  
-  neo4j_service:
-    container_name: "Neo4jService"
-    image: "neo4j_service:1.0.0"
-    build: ./services/Neo4jService
-    command: python main.py
-    volumes:
-      - ./services/Neo4jService:/app
-    ports:
-      - ${NEO4J_PORT}:${NEO4J_PORT}
-    networks:
-      services-network:
-        ipv4_address: ${NEO4J_IP}
-    environment:
-      - NEO4J_PORT=${NEO4J_PORT}
-  
-  redis_service:
-    container_name: "RedisService"
-    image: "redis_service:1.0.0"
-    build: ./services/RedisService
-    command: python main.py
-    volumes:
-      - ./services/RedisService:/app
-    ports:
-      - ${REDIS_PORT}:${REDIS_PORT}
-    networks:
-      services-network:
-        ipv4_address: ${REDIS_IP}
-    environment:
-      - REDIS_PORT=${REDIS_PORT}
-  
-  elastic_service:
-    container_name: "ElasticService"
-    image: "elastic_service:1.0.0"
-    build: ./services/ElasticService
-    command: python main.py
-    volumes:
-      - ./services/ElasticService:/app
-    ports:
-      - ${ELASTIC_PORT}:${ELASTIC_PORT}
-    networks:
-      services-network:
-        ipv4_address: ${ELASTIC_IP}
-    environment:
-      - ELASTIC_PORT=${ELASTIC_PORT}
-  
-  pgsql_service:
-    container_name: "PostgreSqlService"
-    image: "pgsql_service:1.0.0"
-    build: ./services/PostgreSqlService
-    command: python main.py
-    volumes:
-      - ./services/PostgreSqlService:/app
-    ports:
-      - ${POSTGRES_PORT}:${POSTGRES_PORT}
-    networks:
-      services-network:
-        ipv4_address: ${POSTGRES_IP}
-    environment:
-      - POSTGRES_PORT=${POSTGRES_PORT}
-
 networks:
     services-network:
       driver: bridge
