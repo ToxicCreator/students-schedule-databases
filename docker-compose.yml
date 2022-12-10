@@ -10,11 +10,21 @@ services:
     volumes:
       - ./services/MainHub:/app
     ports:
-      - 9000:9000
+      - ${MAIN_HUB_PORT}:${MAIN_HUB_PORT}
     networks:
       services-network:
-        ipv4_address: 10.5.0.10
-  
+        ipv4_address: ${MAIN_HUB_IP}
+    env_file:
+      - .env
+
+  mongo:
+    image: mongo:latest
+    networks:
+      services-network:
+        ipv4_address: ${MONGO_DBASE_IP}
+    ports:
+      - ${MONGO_DBASE_PORT_SECOND}:${MONGO_DBASE_PORT_SECOND}
+
   mongo_service:
     container_name: "MongoService"
     image: "mongo_service:1.0.0"
@@ -23,11 +33,24 @@ services:
     volumes:
       - ./services/MongoService:/app
     ports:
-      - 9001:9001
+      - ${MONGO_SERVICE_PORT}:${MONGO_SERVICE_PORT}
     networks:
       services-network:
-        ipv4_address: 10.5.0.11
-  
+        ipv4_address: ${MONGO_SERVICE_IP}
+    env_file:
+      - .env
+
+  neo4j:
+    image: neo4j:latest
+    environment:
+      - NEO4J_AUTH=${NEO4J_SERVICE_CREDENTIALS}
+    networks:
+      services-network:
+        ipv4_address: ${NEO4J_DBASE_IP}
+    ports:
+      - ${NEO4J_PORT_USELESS}:${NEO4J_PORT_USELESS}
+      - ${NEO4J_DBASE_PORT_SECOND}:${NEO4J_DBASE_PORT_SECOND}
+
   neo4j_service:
     container_name: "Neo4jService"
     image: "neo4j_service:1.0.0"
@@ -36,11 +59,21 @@ services:
     volumes:
       - ./services/Neo4jService:/app
     ports:
-      - 9002:9002
+      - ${NEO4J_SERVICE_PORT}:${NEO4J_SERVICE_PORT}
     networks:
       services-network:
-        ipv4_address: 10.5.0.12
-  
+        ipv4_address: ${NEO4J_SERVICE_IP}
+    env_file:
+      - .env
+
+  redis:
+    image: redis:latest
+    networks:
+      services-network:
+        ipv4_address: ${REDIS_DBASE_IP}
+    ports:
+      - ${REDIS_DBASE_PORT}:${REDIS_DBASE_PORT}
+
   redis_service:
     container_name: "RedisService"
     image: "redis_service:1.0.0"
@@ -49,11 +82,24 @@ services:
     volumes:
       - ./services/RedisService:/app
     ports:
-      - 9003:9003
+      - ${REDIS_SERVICE_PORT}:${REDIS_SERVICE_PORT}
     networks:
       services-network:
-        ipv4_address: 10.5.0.13
-  
+        ipv4_address: ${REDIS_SERVICE_IP}
+    env_file:
+      - .env
+
+  elastic:
+    image: elasticsearch:8.4.3
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: false
+    networks:
+      services-network:
+        ipv4_address: ${ELASTIC_DBASE_IP}
+    ports:
+      - ${ELASTIC_DBASE_PORT}:${ELASTIC_DBASE_PORT}
+
   elastic_service:
     container_name: "ElasticService"
     image: "elastic_service:1.0.0"
@@ -62,11 +108,25 @@ services:
     volumes:
       - ./services/ElasticService:/app
     ports:
-      - 9004:9004
+      - ${ELASTIC_SERVICE_PORT}:${ELASTIC_SERVICE_PORT}
     networks:
       services-network:
-        ipv4_address: 10.5.0.14
-  
+        ipv4_address: ${ELASTIC_SERVICE_IP}
+    env_file:
+      - .env
+
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: ${POSTGRES_DBASE_NAME}
+      POSTGRES_USER: ${POSTGRES_DBASE_LOGIN}
+      POSTGRES_PASSWORD: ${POSTGRES_DBASE_PASSWORD}
+    networks:
+      services-network:
+        ipv4_address: ${POSTGRES_DBASE_IP}
+    ports:
+      - ${POSTGRES_DBASE_PORT_FIRST}:${POSTGRES_DBASE_PORT_SECOND}
+
   pgsql_service:
     container_name: "PostgreSqlService"
     image: "pgsql_service:1.0.0"
@@ -75,15 +135,17 @@ services:
     volumes:
       - ./services/PostgreSqlService:/app
     ports:
-      - 9005:9005
+      - ${POSTGRES_SERVICE_PORT}:${POSTGRES_SERVICE_PORT}
     networks:
       services-network:
-        ipv4_address: 10.5.0.15
+        ipv4_address: ${POSTGRES_SERVICE_IP}
+    env_file:
+      - .env
 
 networks:
     services-network:
       driver: bridge
       ipam:
         config:
-          - subnet: 10.5.0.0/16
-            gateway: 10.5.0.1
+          - subnet: ${DOCKER_SUBNET}
+            gateway: ${DOCKER_GATEWAY}
