@@ -21,13 +21,19 @@ async def index():
 
 
 class StudentsParams(BaseModel):
-    students: list[str]
+    students_id: list[str]
 
 @app.post('/students')
 async def students(body: StudentsParams) -> list:
     requested_students = []
-    for key in body.students:
-        requested_students.append(manager.read(key))
+    print('GORILLA')
+    manager.print_all()
+    for key in body.students_id:
+        print(key)
+        qq = manager.read(key)
+        print('FFFFFFFFFFF', qq)
+        qq["key"] = key
+        requested_students.append(qq)
     return requested_students
 
 

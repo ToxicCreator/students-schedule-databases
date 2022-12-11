@@ -59,9 +59,9 @@ def __fill_lessons(courses_id: list, institutes):
     lessons = Lessons(clear=True)
     descriptions = Descriptions()
     for i in range(len(courses_id)):
-        for lection_num in range(1, 9):
+        for lection_num in range(6, 12):
             lessons.insert(TYPES[0], courses_id[i], courses_names[i], descriptions.insert())
-        for practic_num in range(1, 17):
+        for practic_num in range(8, 16):
             lessons.insert(TYPES[1], courses_id[i], courses_names[i], descriptions.insert())
     return lessons
 
@@ -118,7 +118,7 @@ def __fill_schedule(institutes, lessons, groups):
     return schedule, groups_schedule
 
 
-def __fill_students(groups, schedule, lessons, institutes, min=10, max=20):
+def __fill_students(groups, schedule, lessons, institutes, min=15, max=30):
     graph = Graph()
     redis_students = redis_db.students.Students(host=str(os.getenv('REDIS_DBASE_IP')),
                                                 port=os.getenv('REDIS_DBASE_PORT'), clear=True)
@@ -148,7 +148,7 @@ def __fill_visits(groups_schedule, groups_students):
     for group in groups_schedule:
         for schedule_id_date in groups_schedule[group]:
             for student in groups_students[group]:
-                visits.insert(schedule_id_date[0], student, schedule_id_date[1], check_chance(0.7))
+                visits.insert(schedule_id_date[0], student, schedule_id_date[1], check_chance(90))
 
 
 if __name__ == "__main__":

@@ -19,8 +19,8 @@ class MongoManager():
 
     def __make_connection(self):
         return MongoClient(
-            host=os.getenv("host"),
-            port=os.getenv("port")
+            host=os.getenv("MONGO_DBASE_IP"),
+            port=int(os.getenv("MONGO_DBASE_PORT_SECOND"))
         )
 
 

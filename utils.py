@@ -8,8 +8,6 @@ def parse_data(file_path):
 
 
 def check_chance(chance) -> bool:
-    if chance < 1:
-        chance * 100
     return randint(0, 100) <= chance
 
 

@@ -46,7 +46,7 @@ class Students(Table):
             self.redis_db.delete(key)
 
     def __get_shifr(self):
-        letters = "БСБОКМПФРСГУДИЭХТВ"
+        letters = "ABCDEFGHIKJURSTVX"
         recordBook = str(random.randint(18, 22))
         recordBook += ''.join(random.choice(letters) for i in range(2))
         recordBook += str(random.randint(100, 999))

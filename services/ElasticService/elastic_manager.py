@@ -2,7 +2,7 @@ import os
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Index, Q, Search
 
-class ElasticManager():
+class ElasticManager:
 
     def __init__(self):
         self.__make_connection()
@@ -13,11 +13,11 @@ class ElasticManager():
 
 
     def __make_connection(self):
-        elastic_ip = os.getenv("elastic_ip")
-        elastic_port = os.getenv("elastic_port")
-        self.__client = Elasticsearch(
-            f'http://root:root@{elastic_ip}:{elastic_port}'
-        )
+        elastic_ip = os.getenv("ELASTIC_DBASE_IP")
+        elastic_port = os.getenv("ELASTIC_DBASE_PORT")
+        self.__client = Elasticsearch('http://root:root@{0}:{1}'.format(os.getenv('ELASTIC_DBASE_IP'),
+                                                                      os.getenv('ELASTIC_DBASE_PORT')))
+
 
 
     def retry_connection(self):

@@ -15,8 +15,8 @@ class Neo4jManager():
 
     def __make_connection(self):
         self.__driver = GraphDatabase.driver(
-            uri=f'bolt://{os.getenv("neo4j_host")}:{os.getenv("neo4j_port")}',
-            auth=(os.getenv("neo4j_login"), os.getenv("neo4j_password")),
+            uri=f'bolt://{os.getenv("NEO4J_DBASE_IP")}:{os.getenv("NEO4J_DBASE_PORT_SECOND")}',
+            auth=(os.getenv("NEO4J_DBASE_LOGIN"), os.getenv("NEO4J_DBASE_PASSWORD")),
             max_connection_pool_size=100000
         )
         self.__session = self.__driver.session()

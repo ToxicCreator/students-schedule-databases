@@ -3,7 +3,7 @@ import psycopg2
 
 database = "postgres"
 
-class PsqlManager():
+class PsqlManager:
 
     def __init__(self):
         self.__make_connection()
@@ -19,13 +19,15 @@ class PsqlManager():
 
     def __make_connection(self):
         try:
+            print('1')
             self.__connection = psycopg2.connect(
-                database=database,
-                host=os.getenv("host"),
-                port=os.getenv("port"),
-                user=os.getenv("login"),
-                password=os.getenv("password")
+                database=os.getenv('POSTGRES_DBASE_NAME'),
+                user=os.getenv('POSTGRES_DBASE_LOGIN'),
+                password=os.getenv('POSTGRES_DBASE_PASSWORD'),
+                host=os.getenv('POSTGRES_DBASE_IP'),
+                port=os.getenv('POSTGRES_PORT_FIRST')
             )
+            print('2')
             self.__cursor = self.__connection.cursor()
             return True
         except:

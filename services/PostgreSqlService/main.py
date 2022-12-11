@@ -8,14 +8,6 @@ import time
 
 time.sleep(5)
 app = FastAPI()
-connection = psycopg2.connect(
-            database=os.getenv('POSTGRES_DBASE_NAME'),
-            user=os.getenv('POSTGRES_DBASE_LOGIN'),
-            password=os.getenv('POSTGRES_DBASE_PASSWORD'),
-            host=os.getenv('POSTGRES_DBASE_IP'),
-            port=os.getenv('POSTGRES_PORT_FIRST')
-        )
-cursor = connection.cursor()
 manager = PsqlManager()
 
 @app.get('/')
@@ -28,29 +20,32 @@ async def index():
 
 
 class PercentageOfVisitsParams(BaseModel):
-    lessons_id: list[int]
+    lessons_id: list[str]
     start: str
     end: str
 
 @app.post('/percentage-of-visits')
 async def percentage_of_visits(body: PercentageOfVisitsParams):
+    print('ABOBUS', body.lessons_id)
     query = f'''
         SELECT 
             v.student_id, 
             (count(*) FILTER (WHERE v.visited = TRUE))::float / count(*) * 100 
                 as percentage_of_visits
         FROM schedule sch
-            JOIN visits v ON sch.id = v.schedule_id
+            JOIN visits v ON sch.id = v.shedule_id
             JOIN lessons ls ON sch.lesson_id = ls.id
-        WHERE ls.description_id IN {body.lessons_id}
-            AND v.date BETWEEN {body.start} AND {body.end}
+        WHERE ls.description_id IN ('{"', '".join(body.lessons_id)}')
+            AND v.date BETWEEN '{body.start}' AND '{body.end}'
         GROUP BY v.student_id
         ORDER BY percentage_of_visits LIMIT 10;
     '''
-    query = 'SELECT * FROM visits;'
+    print('111111111111')
     return manager.execute_and_commit(query)
 
 
+
+
 if __name__ == "__main__":
-    port = int(os.getenv('POSTGRES_PORT', 5050))
+    port = int(os.getenv('POSTGRES_SERVICE_PORT', 5050))
     uvicorn.run(app, host="0.0.0.0", port=port)

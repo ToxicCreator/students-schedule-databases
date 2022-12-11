@@ -1,38 +1,51 @@
 import os
 import requests
+import json
 
-ELASTIC_IP = os.getenv('ELASTIC_IP')
-ELASTIC_PORT = os.getenv('ELASTIC_PORT')
-elastic_ip = f'https://{ELASTIC_IP}:{ELASTIC_PORT}/'
+ELASTIC_SERVICE_IP = os.getenv('ELASTIC_SERVICE_IP')
+ELASTIC_SERVICE_PORT = os.getenv('ELASTIC_SERVICE_PORT')
+elastic_ip = f'http://{ELASTIC_SERVICE_IP}:{ELASTIC_SERVICE_PORT}/'
 
-POSTGRES_IP = os.getenv('POSTGRES_IP')
-POSTGRES_PORT = os.getenv('POSTGRES_PORT')
-postgres_url = f'https://{POSTGRES_IP}:{POSTGRES_PORT}/'
+POSTGRES_SERVICE_IP = os.getenv('POSTGRES_SERVICE_IP')
+POSTGRES_SERVICE_PORT = os.getenv('POSTGRES_SERVICE_PORT')
+postgres_url = f'http://{POSTGRES_SERVICE_IP}:{POSTGRES_SERVICE_PORT}/'
 
-REDIS_IP = os.getenv('REDIS_IP')
-REDIS_PORT = os.getenv('REDIS_PORT')
-redis_url = f'https://{REDIS_IP}:{REDIS_PORT}/'
+REDIS_SERVICE_IP = os.getenv('REDIS_SERVICE_IP')
+REDIS_SERVICE_PORT = os.getenv('REDIS_SERVICE_PORT')
+redis_url = f'http://{REDIS_SERVICE_IP}:{REDIS_SERVICE_PORT}/'
 
 
 def makeFirstRequest(start: str, end: str, term: str):
     lessons_id = get_lessons_id_by_description(term)
-    (students_id, percentage_of_visits) = get_percentage_of_visits(
+    students_visits = get_percentage_of_visits(
         lessons_id, 
         start, 
         end
-    )
+    ).json()
+    students_id = [student[0] for student in students_visits]
     students = get_students(students_id)
-    return (students, percentage_of_visits)
+    for i, dict_ in enumerate(students):
+        for j in range(len(students_visits)):
+            if students_visits[j][0] == dict_["key"]:
+                students[i]["percent_of_attendance"] = students_visits[j][1]
+    result_dict = {
+        'date_start' : start,
+        'date_end': end,
+        'term': term,
+        "students": students
+    }
+    return result_dict
 
 
 def get_lessons_id_by_description(term: str):
     url = elastic_ip + 'description'
-    return requests.get(
-        url=url, 
+    result = requests.get(
+        url=url,
         params={
             'term': term
         }
     )
+    return result.json()
 
 
 def get_percentage_of_visits(lessons_id, start, end):
@@ -42,11 +55,19 @@ def get_percentage_of_visits(lessons_id, start, end):
         'start': start,
         'end': end
     }
-    return requests.post(url=url, json=postgres_body)
+    res = requests.post(url=url, json=postgres_body)
+    return res
 
 
 def get_students(students_id):
     url = redis_url + 'students'
-    return requests.post(url=url, json={
+    print('URL:', url)
+    print('STUDENTS TO REDIS:', students_id)
+    students_dict = {
         "students_id": students_id
-    })
+    }
+    print(students_dict)
+    obj = requests.post(url=url, json=students_dict).json()
+    print('REDIS STUDENTS:', obj)
+    print(type(obj))
+    return obj

@@ -17,8 +17,8 @@ class RedisManager():
 
     def __make_connection(self):
         self.__database = redis.Redis(
-            host=os.getenv("redis_host", "localhost"),
-            port=int(os.getenv("redis_port", 6379)),
+            host=os.getenv("REDIS_DBASE_IP", "localhost"),
+            port=int(os.getenv("REDIS_DBASE_PORT", 6379)),
             db=0,
             charset='UTF-8',
             decode_responses=True
@@ -32,3 +32,9 @@ class RedisManager():
 
     def read(self, key):
         return self.__database.hgetall(key)
+
+
+    def print_all(self):
+        keys = self.__database.keys('*')
+        for key in keys:
+            print(key)

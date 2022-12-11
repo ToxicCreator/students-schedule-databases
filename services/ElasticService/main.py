@@ -12,9 +12,14 @@ async def index():
 
 @app.get('/description')
 async def description(term: str):
-    return manager.read_query('lessons', {
+    obj = manager.read_query('lessons', {
         'materials': term
     })
+    hits_id = []
+    for hit in obj['hits']['hits']:
+        hits_id.append(hit["_id"])
+        print(hit["_id"])
+    return hits_id
 
 
 if __name__ == "__main__":

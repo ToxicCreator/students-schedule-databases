@@ -2,7 +2,7 @@
 import os
 from fastapi import FastAPI
 import uvicorn
-from first_request import makeFirstRequest
+from first_request import makeFirstRequest as mfr
 
 
 app = FastAPI()
@@ -23,7 +23,8 @@ async def index():
 
 @app.get('/make-first-request')
 def makeFirstRequest(start: str, end: str, term: str):
-    return makeFirstRequest(start, end, term)
+    print(start, end, term)
+    return mfr(start, end, term)
 
 
 @app.get('/make-second-request')
