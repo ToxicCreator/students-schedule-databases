@@ -2,3 +2,4 @@ uvicorn
 fastapi
 redis
 pydantic
+typing

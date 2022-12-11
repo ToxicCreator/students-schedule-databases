@@ -1,40 +1,41 @@
 import os
 import redis
+from typing import Union, Awaitable, List
 
-class RedisManager():
+
+class RedisManager:
 
     def __init__(self):
-        self.__make_connection()
+        self.__database: redis.Redis = None
 
-
-    def check_connection(self):
+    def check_connection(self) -> bool:
         try:
             self.__database.ping()
-            return True
-        except:
+        except redis.exceptions.ConnectionError:
             return False
+        return True
 
+    def connect(self) -> bool:
+        try:
+            self.__database = redis.Redis(
+                host=os.getenv("REDIS_DBASE_IP", "localhost"),
+                port=int(os.getenv("REDIS_DBASE_PORT", 6379)),
+                db=0,
+                charset='UTF-8',
+                decode_responses=True
+            )
+        except redis.exceptions.ConnectionError:
+            return False
+        return True
 
-    def __make_connection(self):
-        self.__database = redis.Redis(
-            host=os.getenv("REDIS_DBASE_IP", "localhost"),
-            port=int(os.getenv("REDIS_DBASE_PORT", 6379)),
-            db=0,
-            charset='UTF-8',
-            decode_responses=True
-        )
-
-
-    def retry_connection(self):
-        self.__make_connection()
+    def retry_connection(self) -> bool:
+        self.connect()
         return self.check_connection()
 
-
-    def read(self, key):
+    def read(self, key: str) -> Union[Awaitable[dict], dict]:
         return self.__database.hgetall(key)
 
-
-    def print_all(self):
+    def print_all(self) -> List:
         keys = self.__database.keys('*')
         for key in keys:
             print(key)

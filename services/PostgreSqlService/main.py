@@ -3,12 +3,15 @@ import uvicorn
 from fastapi import FastAPI
 from pydantic import BaseModel
 from psql_manager import PsqlManager
-import psycopg2
 import time
+from typing import List
 
-time.sleep(5)
+
 app = FastAPI()
+time.sleep(5)
 manager = PsqlManager()
+manager.connect()
+
 
 @app.get('/')
 async def index():
@@ -20,13 +23,13 @@ async def index():
 
 
 class PercentageOfVisitsParams(BaseModel):
-    lessons_id: list[str]
+    lessons_id: List[str]
     start: str
     end: str
 
+
 @app.post('/percentage-of-visits')
 async def percentage_of_visits(body: PercentageOfVisitsParams):
-    print('ABOBUS', body.lessons_id)
     query = f'''
         SELECT 
             v.student_id, 
@@ -40,10 +43,7 @@ async def percentage_of_visits(body: PercentageOfVisitsParams):
         GROUP BY v.student_id
         ORDER BY percentage_of_visits LIMIT 10;
     '''
-    print('111111111111')
     return manager.execute_and_commit(query)
-
-
 
 
 if __name__ == "__main__":

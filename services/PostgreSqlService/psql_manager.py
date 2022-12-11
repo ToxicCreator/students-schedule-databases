@@ -1,25 +1,23 @@
 import os
 import psycopg2
+from typing import List
 
-database = "postgres"
 
 class PsqlManager:
 
     def __init__(self):
-        self.__make_connection()
-
+        self.cursor = None
+        self.__connection = None
 
     def check_connection(self):
         try:
-            self.__cursor.execute('SELECT 1')
-            return True
-        except:
+            self.cursor.execute('SELECT 1')
+        except psycopg2.OperationalError:
             return False
+        return True
 
-
-    def __make_connection(self):
+    def connect(self) -> bool:
         try:
-            print('1')
             self.__connection = psycopg2.connect(
                 database=os.getenv('POSTGRES_DBASE_NAME'),
                 user=os.getenv('POSTGRES_DBASE_LOGIN'),
@@ -27,22 +25,18 @@ class PsqlManager:
                 host=os.getenv('POSTGRES_DBASE_IP'),
                 port=os.getenv('POSTGRES_PORT_FIRST')
             )
-            print('2')
-            self.__cursor = self.__connection.cursor()
-            return True
-        except:
+            self.cursor = self.__connection.cursor()
+        except psycopg2.OperationalError:
             return False
-
+        return True
 
     def retry_connection(self):
-        return self.__make_connection()
-
+        return self.connect()
 
     def __del__(self):
         self.__connection.close()
 
-
-    def execute_and_commit(self, query: str):
-        self.__cursor.execute(query)
+    def execute_and_commit(self, query: str) -> List[tuple]:
+        self.cursor.execute(query)
         self.__connection.commit()
-        return self.__cursor.fetchall()
+        return self.cursor.fetchall()

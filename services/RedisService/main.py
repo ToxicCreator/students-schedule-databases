@@ -2,18 +2,13 @@ import uvicorn
 from fastapi import FastAPI
 from pydantic import BaseModel
 from redis_manager import RedisManager
-import redis
 import os
+from typing import List
 
-redis_db = redis.Redis(
-            host=str(os.getenv('REDIS_DBASE_IP')),
-            port=os.getenv('REDIS_DBASE_PORT'),
-            db=int(os.getenv('REDIS_DB')),
-            charset=str(os.getenv('REDIS_CHARSET')),
-            decode_responses=True
-        )
 app = FastAPI()
 manager = RedisManager()
+manager.connect()
+
 
 @app.get('/')
 async def index():
@@ -21,17 +16,15 @@ async def index():
 
 
 class StudentsParams(BaseModel):
-    students_id: list[str]
+    students_id: List[str]
+
 
 @app.post('/students')
-async def students(body: StudentsParams) -> list:
+async def students(body: StudentsParams) -> List:
     requested_students = []
-    print('GORILLA')
     manager.print_all()
     for key in body.students_id:
-        print(key)
         qq = manager.read(key)
-        print('FFFFFFFFFFF', qq)
         qq["key"] = key
         requested_students.append(qq)
     return requested_students

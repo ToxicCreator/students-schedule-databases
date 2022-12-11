@@ -1,8 +1,10 @@
 from elastic_manager import ElasticManager
 from fastapi import FastAPI
 import uvicorn
+
 app = FastAPI()
 manager = ElasticManager()
+manager.connect()
 
 
 @app.get('/')
