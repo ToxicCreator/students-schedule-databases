@@ -18,6 +18,7 @@ services:
       - .env
 
   mongo:
+    container_name: "mongo_db"
     image: mongo:latest
     networks:
       services-network:
@@ -41,6 +42,7 @@ services:
       - .env
 
   neo4j:
+    container_name: "neo4j_db"
     image: neo4j:latest
     environment:
       - NEO4J_AUTH=${NEO4J_SERVICE_CREDENTIALS}
@@ -67,6 +69,7 @@ services:
       - .env
 
   redis:
+    container_name: "redis_db"
     image: redis:latest
     networks:
       services-network:
@@ -90,6 +93,7 @@ services:
       - .env
 
   elastic:
+    container_name: "elastic_db"
     image: elasticsearch:8.4.3
     environment:
       discovery.type: single-node
@@ -116,6 +120,7 @@ services:
       - .env
 
   postgres:
+    container_name: "postgres_db"
     image: postgres:latest
     environment:
       POSTGRES_DB: ${POSTGRES_DBASE_NAME}
