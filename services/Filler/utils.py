@@ -2,8 +2,9 @@ from json import load
 from datetime import date
 from random import randint, choices, choice
 
+
 def parse_data(file_path):
-    with open(file_path, encoding = 'utf-8') as file:
+    with open(file_path, encoding='utf-8') as file:
         return load(file)
 
 
@@ -25,11 +26,11 @@ def generate_group_name() -> str:
 
 
 def get_lesson_date(
-        lesson_number, 
+        lesson_number,
         lessons_count,
-        months_count, 
+        months_count,
         first_year
-    ):
+):
     assert lesson_number <= lessons_count
     assert 1990 <= first_year <= 2022
     assert 1 <= months_count <= 45

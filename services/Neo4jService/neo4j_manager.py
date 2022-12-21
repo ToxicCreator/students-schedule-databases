@@ -1,25 +1,27 @@
 import os
+import neo4j
 from neo4j import GraphDatabase
 
-class Neo4jManager():
+
+class Neo4jManager:
 
     def __init__(self):
-        self.__make_connection()
+        self.session: neo4j.Session = self.__make_connection()
 
-    def check_connection(self):
+    def check_connection(self) -> bool:
         try:
             self.__session.run("Match () return 1 Limit 1")
-            return True
-        except:
+        except (Exception,):
             return False
+        return True
 
-    def __make_connection(self):
-        self.__driver = GraphDatabase.driver(
-            uri=f'bolt://{os.getenv("neo4j_host")}:{os.getenv("neo4j_port")}',
-            auth=(os.getenv("neo4j_login"), os.getenv("neo4j_password")),
-            max_connection_pool_size=100000
-        )
-        self.__session = self.__driver.session()
+    @staticmethod
+    def __make_connection() -> neo4j.Session:
+        session = GraphDatabase.driver(
+            uri="bolt://{0}:{1}".format(os.getenv('NEO4J_DBASE_IP'), int(os.getenv('NEO4J_DBASE_PORT_SECOND'))),
+            auth=(str(os.getenv('NEO4J_DBASE_LOGIN')), str(os.getenv('NEO4J_DBASE_PASSWORD'))),
+            max_connection_pool_size=100000).session()
+        return session
 
     def retry_connection(self):
         self.__make_connection()

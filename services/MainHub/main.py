@@ -1,29 +1,41 @@
+import os
 from fastapi import FastAPI
 import uvicorn
-import requests
+from first_request import makeFirstRequest as mfr
+
 
 app = FastAPI()
 
 
 @app.get('/')
 async def index():
-    return {"message": "MainHub"}
+    return {
+        "/make-first-request": {
+            "start_date": "Начало периода обучения",
+            "end_date": "Конец периода обучения",
+            "term": "Заданный термин или фраза"
+        },
+        "/make-second-request": {},
+        "/make-third-request": {}
+    }
 
 
-@app.get('/makeFirstRequest')
-def makeFirstRequest():
-    pass
+@app.get('/make-first-request')
+def makeFirstRequest(start: str, end: str, term: str):
+    print(start, end, term)
+    return mfr(start, end, term)
 
 
-@app.get('/makeSecondRequest')
+@app.get('/make-second-request')
 def makeSecondRequest():
     pass
 
 
-@app.get('/makeThirdRequest')
+@app.get('/make-third-request')
 def makeThirdRequest():
     pass
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=9000)
+    port = int(os.getenv('MAIN_HUB_PORT', 9000))
+    uvicorn.run(app, host="0.0.0.0", port=port)

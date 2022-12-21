@@ -1,33 +1,31 @@
 import os
+import pymongo
 from pymongo import MongoClient
 
 
-class MongoManager():
+class MongoManager:
 
-    def __init__(self, db_name):
-        self.__client = self.__make_connection()
-        self.db = self.__client[db_name]
-
+    def __init__(self):
+        self.__client: MongoClient = self.__make_connection()
+        self.db: MongoClient = self.__client[str(os.getenv('MONGO_DBASE_NAME'))]
 
     def check_connection(self):
         try:
             self.__client.server_info()
-            return True
-        except:
+        except (Exception,):
             return False
+        return True
 
-
-    def __make_connection(self):
+    @staticmethod
+    def __make_connection() -> MongoClient:
         return MongoClient(
-            host=os.getenv("host"),
-            port=os.getenv("port")
+            host=os.getenv("MONGO_DBASE_IP"),
+            port=int(os.getenv("MONGO_DBASE_PORT_SECOND"))
         )
 
-
-    def retry_connection(self):
+    def retry_connection(self) -> bool:
         self.__client = self.__make_connection()
         return self.check_connection()
 
-
-    def collection(self, collection_name):
+    def get_collection(self, collection_name: str) -> pymongo.collection.Collection:
         return self.db[collection_name]
