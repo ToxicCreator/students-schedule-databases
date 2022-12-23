@@ -20,30 +20,37 @@ async def index():
         }
     }
 
+class LessonsQueryBody(BaseModel):
+    descriptions_id: List[str]
 
-class PercentageOfVisitsParams(BaseModel):
-    description_id: List[str]
-    start: str
-    end: str
-
-
-@app.post('/percentage-of-visits')
-async def percentage_of_visits(body: PercentageOfVisitsParams):
+@app.post('/lessons-by-desscriptions-id')
+async def lessons_by_desscriptions_id(body: LessonsQueryBody):
     query = f'''
-        SELECT 
-            v.student_id, 
-            (count(*) FILTER (WHERE v.visited = TRUE))::float / count(*) * 100 
-                as percentage_of_visits
-        FROM schedule sch
-            JOIN visits v ON sch.id = v.shedule_id
-            JOIN lessons ls ON sch.lesson_id = ls.id
-        WHERE ls.description_id IN ('{"', '".join(body.description_id)}')
-            AND v.date BETWEEN '{body.start}' AND '{body.end}'
-        GROUP BY v.student_id
-        ORDER BY percentage_of_visits LIMIT 10;
+        SELECT id 
+        FROM lessons 
+        WHERE description_id IN ('{"', '".join(body.descriptions_id)}');
     '''
     return manager.execute_and_commit(query)
 
+class PercentageQueryBody(BaseModel):
+    visits_id: List[str]
+    start: str
+    end: str
+
+@app.post('/visits-by-lessons-id')
+async def visits_by_lessons_id(body: PercentageQueryBody):
+    query = f'''
+        SELECT 
+            student_id, 
+            (count(*) FILTER (WHERE visited = TRUE))::float / count(*) * 100 
+                as percentage_of_visits
+        FROM visits
+        WHERE id IN ('{"', '".join(body.visits_id)}')
+            AND date BETWEEN '{body.start}' AND '{body.end}'
+        GROUP BY student_id
+        ORDER BY percentage_of_visits LIMIT 10;
+    '''
+    return manager.execute_and_commit(query)
 
 if __name__ == "__main__":
     port = int(os.getenv('POSTGRES_SERVICE_PORT', 5050))

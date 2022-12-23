@@ -26,3 +26,6 @@ class Neo4jManager:
     def retry_connection(self):
         self.__make_connection()
         return self.check_connection()
+
+    def execute_query(self, query_str):
+        return self.__session.run(query_str)
