@@ -14,14 +14,20 @@ REDIS_SERVICE_IP = os.getenv('REDIS_SERVICE_IP')
 REDIS_SERVICE_PORT = os.getenv('REDIS_SERVICE_PORT')
 redis_url = f'http://{REDIS_SERVICE_IP}:{REDIS_SERVICE_PORT}/'
 
+NEO4J_SERVICE_IP = os.getenv('NEO4J_SERVICE_IP')
+NEO4J_SERVICE_PORT = os.getenv('NEO4J_SERVICE_PORT')
+neo4j_url = f'http://{NEO4J_SERVICE_IP}:{NEO4J_SERVICE_PORT}/'
+
 
 def makeFirstRequest(start: str, end: str, term: str) -> dict:
     description_id = get_description_id(term)
-    students_visits = get_percentage_of_visits(
-        description_id=description_id,
-        start=start,
-        end=end
-    ).json()
+    lessons_id = get_lessons_id_by(description_id)
+    visits_id = get_visits_id_by(lessons_id)
+    students_visits = get_percentage_of_visits_by_date(
+        date_start=start,
+        date_end=end,
+        visits_id=visits_id
+    )
     students_id = [student[0] for student in students_visits]
     students = get_students(students_id)
     for i, dict_ in enumerate(students):
@@ -36,7 +42,6 @@ def makeFirstRequest(start: str, end: str, term: str) -> dict:
     }
     return result_dict
 
-
 def get_description_id(term: str) -> dict:
     url = elastic_ip + 'description'
     result = requests.get(
@@ -47,22 +52,33 @@ def get_description_id(term: str) -> dict:
     )
     return result.json()
 
-
-def get_percentage_of_visits(description_id, start, end) -> requests.Response:
-    url = postgres_url + 'percentage-of-visits'
-    postgres_body = {
-        'description_id': description_id,
-        'start': start,
-        'end': end
+def get_lessons_id_by(descriptions_id):
+    url = postgres_url + 'lessons-by-desscriptions-id'
+    query_body = {
+        "descriptions_id": descriptions_id
     }
-    res = requests.post(url=url, json=postgres_body)
-    return res
+    return requests.post(urls=url, json=query_body).json()
 
+def get_visits_id_by(lessons_id):
+    url = neo4j_url + 'visits-by-lessons-id'
+    query_body = {
+        "lessons_id": lessons_id
+    }
+    return requests.post(urls=url, json=query_body).json()
+
+def get_percentage_of_visits_by_date(date_start, date_end, visits_id):
+    url = postgres_url + 'visits-by-lessons-id'
+    query_body = {
+        "visits_id": visits_id,
+        "start": date_start,
+        "end": date_end
+    }
+    return requests.post(urls=url, json=query_body).json()
 
 def get_students(students_id):
     url = redis_url + 'students'
-    students_dict = {
+    query_body = {
         "students_id": students_id
     }
-    obj = requests.post(url=url, json=students_dict).json()
+    obj = requests.post(url=url, json=query_body).json()
     return obj
