@@ -1,6 +1,5 @@
 import os
 import requests
-import json
 import itertools
 
 ELASTIC_SERVICE_IP = os.getenv('ELASTIC_SERVICE_IP')
@@ -22,20 +21,15 @@ neo4j_url = f'http://{NEO4J_SERVICE_IP}:{NEO4J_SERVICE_PORT}/'
 
 def makeFirstRequest(start: str, end: str, term: str) -> dict:
     description_id = get_description_id(term)
-    print('DESCRIPTION_ID', description_id)
     lessons_id = get_lessons_id_by(description_id)
-    print('LESSON_ID', lessons_id)
     visits_id = get_visits_id_by(lessons_id)
-    print('VISITS_ID', visits_id)
     students_visits = get_percentage_of_visits_by_date(
         date_start=start,
         date_end=end,
         visits_id=visits_id
     )
-    print('STUDENTS_VISITS', students_visits)
     students_id = [student[0] for student in students_visits]
     students = get_students(students_id)
-    print('STUDENTS', students)
     for i, dict_ in enumerate(students):
         for j in range(len(students_visits)):
             if students_visits[j][0] == dict_["key"]:
