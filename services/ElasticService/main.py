@@ -19,7 +19,6 @@ async def description(term: str):
     hits_id = []
     for hit in obj['hits']['hits']:
         hits_id.append(hit["_id"])
-        print(hit["_id"])
     return hits_id
 
 

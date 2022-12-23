@@ -22,7 +22,6 @@ async def index():
 
 @app.get('/make-first-request')
 def makeFirstRequest(start: str, end: str, term: str):
-    print(start, end, term)
     return mfr(start, end, term)
 
 

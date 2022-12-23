@@ -70,7 +70,7 @@ class Graph:
 
     def create_visit_node(self, visit_id, lesson_id):
         query = f'''
-            MATCH (l:lesson {{id: {lesson_id}}}) WITH l
+            MATCH (l:lesson {{Id: {lesson_id}}}) WITH l
             CREATE (v:visit {{id: {visit_id}}})-[r:refers_to]->(l)
             RETURN v, r;
         '''

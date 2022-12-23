@@ -16,14 +16,19 @@ async def index():
     return {"message": "Neo4j"}
 
 class VisitsQueryBody(BaseModel):
-    lessons_id: List[str]
+    lessons_id: List[int]
 
-@app.get('/visits-by-lessons-id')
+@app.post('/visits-by-lessons-id')
 async def visits_by_lessons_id(body: VisitsQueryBody):
+    listing_ = [str(item) for item in body.lessons_id]
+    listing = ", ".join(listing_)
+    print('LESSONS_IDS_IN_NEO4J', listing)
     query = f'''
-        MATCH(v:visit) WHERE v.name in [{"', '".join(body.lessons_id)}] return v
+        MATCH (v:visit)-[:refers_to]->(l:lesson) WHERE l.Id in [{listing}] RETURN v.id
     '''
-    return list(manager.execute_query(query))
+    result = manager.execute_query(query)
+    print('RESULT', result)
+    return list(result)
 
 
 if __name__ == "__main__":

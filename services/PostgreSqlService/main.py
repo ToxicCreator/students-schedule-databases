@@ -33,19 +33,19 @@ async def lessons_by_desscriptions_id(body: LessonsQueryBody):
     return manager.execute_and_commit(query)
 
 class PercentageQueryBody(BaseModel):
-    visits_id: List[str]
+    visits_id: List[int]
     start: str
     end: str
 
-@app.post('/visits-by-lessons-id')
-async def visits_by_lessons_id(body: PercentageQueryBody):
+@app.post('/percentage-of-visits-by-date')
+async def percentage_of_visits_by_date(body: PercentageQueryBody):
     query = f'''
         SELECT 
             student_id, 
             (count(*) FILTER (WHERE visited = TRUE))::float / count(*) * 100 
                 as percentage_of_visits
         FROM visits
-        WHERE id IN ('{"', '".join(body.visits_id)}')
+        WHERE id IN ({", ".join([str(item) for item in body.visits_id])})
             AND date BETWEEN '{body.start}' AND '{body.end}'
         GROUP BY student_id
         ORDER BY percentage_of_visits LIMIT 10;

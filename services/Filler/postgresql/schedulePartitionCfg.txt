@@ -1,17 +1,17 @@
-CREATE index scheduleDate on schedule (date);
+CREATE index IF NOT EXISTS scheduleDate on schedule (date);
 
-CREATE TABLE schedule1  (CHECK (date_part('month', date) = 1))  INHERITS (schedule);
-CREATE TABLE schedule2  (CHECK (date_part('month', date) = 2))  INHERITS (schedule);
-CREATE TABLE schedule3  (CHECK (date_part('month', date) = 3))  INHERITS (schedule);
-CREATE TABLE schedule4  (CHECK (date_part('month', date) = 4))  INHERITS (schedule);
-CREATE TABLE schedule5  (CHECK (date_part('month', date) = 5))  INHERITS (schedule);
-CREATE TABLE schedule6  (CHECK (date_part('month', date) = 6))  INHERITS (schedule);
-CREATE TABLE schedule7  (CHECK (date_part('month', date) = 7))  INHERITS (schedule);
-CREATE TABLE schedule8  (CHECK (date_part('month', date) = 8))  INHERITS (schedule);
-CREATE TABLE schedule9  (CHECK (date_part('month', date) = 9))  INHERITS (schedule);
-CREATE TABLE schedule10 (CHECK (date_part('month', date) = 10)) INHERITS (schedule);
-CREATE TABLE schedule11 (CHECK (date_part('month', date) = 11)) INHERITS (schedule);
-CREATE TABLE schedule12 (CHECK (date_part('month', date) = 12)) INHERITS (schedule);
+CREATE TABLE IF NOT EXISTS schedule1  (CHECK (date_part('month', date) = 1))  INHERITS (schedule);
+CREATE TABLE IF NOT EXISTS schedule2  (CHECK (date_part('month', date) = 2))  INHERITS (schedule);
+CREATE TABLE IF NOT EXISTS schedule3  (CHECK (date_part('month', date) = 3))  INHERITS (schedule);
+CREATE TABLE IF NOT EXISTS schedule4  (CHECK (date_part('month', date) = 4))  INHERITS (schedule);
+CREATE TABLE IF NOT EXISTS schedule5  (CHECK (date_part('month', date) = 5))  INHERITS (schedule);
+CREATE TABLE IF NOT EXISTS schedule6  (CHECK (date_part('month', date) = 6))  INHERITS (schedule);
+CREATE TABLE IF NOT EXISTS schedule7  (CHECK (date_part('month', date) = 7))  INHERITS (schedule);
+CREATE TABLE IF NOT EXISTS schedule8  (CHECK (date_part('month', date) = 8))  INHERITS (schedule);
+CREATE TABLE IF NOT EXISTS schedule9  (CHECK (date_part('month', date) = 9))  INHERITS (schedule);
+CREATE TABLE IF NOT EXISTS schedule10 (CHECK (date_part('month', date) = 10)) INHERITS (schedule);
+CREATE TABLE IF NOT EXISTS schedule11 (CHECK (date_part('month', date) = 11)) INHERITS (schedule);
+CREATE TABLE IF NOT EXISTS schedule12 (CHECK (date_part('month', date) = 12)) INHERITS (schedule);
 
 CREATE OR REPLACE FUNCTION schedulePartitionInsert()
   RETURNS trigger AS
@@ -27,4 +27,4 @@ END;
 $$
 LANGUAGE 'plpgsql';
 
-create trigger schedulePartition before insert on schedule for each row execute procedure schedulePartitionInsert();
+create or replace trigger schedulePartition before insert on schedule for each row execute procedure schedulePartitionInsert();
