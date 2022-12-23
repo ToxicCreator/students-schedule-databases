@@ -10,7 +10,6 @@ from typing import List
 app = FastAPI()
 time.sleep(5)
 manager = PsqlManager()
-manager.connect()
 
 
 @app.get('/')
@@ -23,7 +22,7 @@ async def index():
 
 
 class PercentageOfVisitsParams(BaseModel):
-    lessons_id: List[str]
+    description_id: List[str]
     start: str
     end: str
 
@@ -38,7 +37,7 @@ async def percentage_of_visits(body: PercentageOfVisitsParams):
         FROM schedule sch
             JOIN visits v ON sch.id = v.shedule_id
             JOIN lessons ls ON sch.lesson_id = ls.id
-        WHERE ls.description_id IN ('{"', '".join(body.lessons_id)}')
+        WHERE ls.description_id IN ('{"', '".join(body.description_id)}')
             AND v.date BETWEEN '{body.start}' AND '{body.end}'
         GROUP BY v.student_id
         ORDER BY percentage_of_visits LIMIT 10;

@@ -2,12 +2,10 @@ import uvicorn
 from fastapi import FastAPI
 from pydantic import BaseModel
 from redis_manager import RedisManager
-import os
 from typing import List
 
 app = FastAPI()
 manager = RedisManager()
-manager.connect()
 
 
 @app.get('/')
@@ -22,11 +20,10 @@ class StudentsParams(BaseModel):
 @app.post('/students')
 async def students(body: StudentsParams) -> List:
     requested_students = []
-    manager.print_all()
     for key in body.students_id:
-        qq = manager.read(key)
-        qq["key"] = key
-        requested_students.append(qq)
+        temp = manager.read(key)
+        temp["key"] = key
+        requested_students.append(temp)
     return requested_students
 
 

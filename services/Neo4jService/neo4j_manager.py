@@ -6,7 +6,7 @@ from neo4j import GraphDatabase
 class Neo4jManager:
 
     def __init__(self):
-        self.session: neo4j.Session = self.__make_connection()
+        self.__session: neo4j.Session = self.__make_connection()
 
     def check_connection(self) -> bool:
         try:
