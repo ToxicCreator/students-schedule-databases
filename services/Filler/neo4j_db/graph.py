@@ -9,8 +9,6 @@ from neo4j_db.neo4j_manager import Neo4jManager
 from utils import parse_data
 
 
-
-
 class Graph:
     def __init__(self):
         self.client = Neo4jManager()
@@ -93,7 +91,6 @@ class Graph:
         return self.client.execute(query, {
             'Id': lesson_id
         }).single()
-
 
     def clear(self):
         self.client.clear_all()

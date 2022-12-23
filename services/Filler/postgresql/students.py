@@ -14,9 +14,11 @@ sys.path.append(parentdir)
 class Students(Table):
     TABLE_NAME = 'students'
 
-    def __init__(self, clear = False):
-        self.psql = PsqlManager(os.getenv('POSTGRES_DBASE_IP'), os.getenv('POSTGRES_PORT_FIRST'),
-                                os.getenv('POSTGRES_DBASE_LOGIN'), os.getenv('POSTGRES_DBASE_PASSWORD'))
+    def __init__(self, clear=False):
+        self.psql = PsqlManager(
+            os.getenv('POSTGRES_DBASE_IP'), os.getenv('POSTGRES_PORT_FIRST'),
+            os.getenv('POSTGRES_DBASE_LOGIN'), os.getenv('POSTGRES_DBASE_PASSWORD')
+        )
         if clear:
             self.clear()
         self.create_table()
@@ -40,12 +42,11 @@ class Students(Table):
         self.psql.execute_and_commit(query)
         return self.psql.cursor.fetchall()
 
-
     def insert(self, student_id, group_id, name, surname):
         map_key_values = {
-            'id' : student_id,
-            'group_id' : group_id,
-            'name' : name,
+            'id': student_id,
+            'group_id': group_id,
+            'name': name,
             'surname': surname
         }
         self.psql.insert(self.TABLE_NAME, map_key_values)

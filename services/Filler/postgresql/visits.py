@@ -13,8 +13,9 @@ class Visits(Table):
     TABLE_NAME = 'visits'
 
     def __init__(self, clear=False):
-        self.psql = PsqlManager(os.getenv('POSTGRES_DBASE_IP'), os.getenv('POSTGRES_PORT_FIRST'),
-                                os.getenv('POSTGRES_DBASE_LOGIN'), os.getenv('POSTGRES_DBASE_PASSWORD'))
+        self.psql = PsqlManager(
+            os.getenv('POSTGRES_DBASE_IP'), os.getenv('POSTGRES_PORT_FIRST'),
+            os.getenv('POSTGRES_DBASE_LOGIN'), os.getenv('POSTGRES_DBASE_PASSWORD'))
         if clear:
             self.clear()
         self.create_table()
@@ -36,11 +37,11 @@ class Visits(Table):
         with open("postgresql/visitsPartitionCfg.txt") as file:
             self.psql.execute_and_commit(file.read())
 
-    def insert(self, schedule_id, student_id, date, visited = False):
+    def insert(self, schedule_id, student_id, date, visited=False):
         map_key_values = {
-            'schedule_id' : schedule_id,
-            'student_id' : student_id,
-            'date' : date,
+            'schedule_id': schedule_id,
+            'student_id': student_id,
+            'date': date,
             'visited': visited
         }
         return self.psql.insert(self.TABLE_NAME, map_key_values)[0]

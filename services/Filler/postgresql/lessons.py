@@ -11,14 +11,17 @@ sys.path.append(parentdir)
 
 week_count = 53
 
+
 class Lessons(Table):
     TABLE_NAME = 'lessons'
 
     def __init__(self, clear=False):
-        self.psql = PsqlManager(os.getenv('POSTGRES_DBASE_IP'), os.getenv('POSTGRES_PORT_FIRST'),
-                                os.getenv('POSTGRES_DBASE_LOGIN'), os.getenv('POSTGRES_DBASE_PASSWORD'))
+        self.psql = PsqlManager(
+            os.getenv('POSTGRES_DBASE_IP'), os.getenv('POSTGRES_PORT_FIRST'),
+            os.getenv('POSTGRES_DBASE_LOGIN'), os.getenv('POSTGRES_DBASE_PASSWORD')
+        )
         self.graph = Graph()
-        
+
         if clear:
             self.clear()
         self.create_table()
@@ -58,7 +61,6 @@ class Lessons(Table):
         '''
         self.psql.execute_and_commit(query)
         return self.psql.cursor.fetchone()
-    
 
     def read_by_course_ids(self, course_ids):
         query = f'''
@@ -68,7 +70,7 @@ class Lessons(Table):
         '''
         self.psql.execute_and_commit(query)
         return self.psql.cursor.fetchall()
-        
+
     def read_by_lesson_ids(self, lesson_ids):
         query = f'''
                    SELECT DISTINCT course_id FROM {self.TABLE_NAME} 
@@ -77,7 +79,7 @@ class Lessons(Table):
         self.psql.execute_and_commit(query)
         return self.psql.cursor.fetchall()
 
-    def update(self, lesson_id, name=False, lesson_type = False, course_id = False) -> None:
+    def update(self, lesson_id, name=False, lesson_type=False, course_id=False) -> None:
         if lesson_type:
             self.update_type(lesson_id, lesson_type)
         if course_id:

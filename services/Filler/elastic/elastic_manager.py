@@ -4,12 +4,6 @@ from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Index, Q, Search
 from singleton import MetaSingleton
 
-# wsl -d docker-desktop
-# sysctl -w vm.max_map_count=262144
-# exit
-# docker run -d --name elastic-cnt -p 9200:9200 -e \
-# "http.cors.enabled=true" -e "http.cors.allow-origin=/.*/" elasticsearch:6.5.0
-
 
 LAG = 0.5
 
@@ -27,7 +21,7 @@ class ElasticManager(metaclass=MetaSingleton):
         return index
 
     def delete_index(self, name):
-        index = Index(name, using = self.__client__)
+        index = Index(name, using=self.__client__)
         if not index.exists():
             return None
         index.delete()
@@ -52,7 +46,7 @@ class ElasticManager(metaclass=MetaSingleton):
 
     def update(self, index, id, doc_type, doc):
         updated = self.__client__.update(
-            index = index, id = id, doc_type = doc_type, doc = doc
+            index=index, id=id, doc_type=doc_type, doc=doc
         )
         time.sleep(LAG)
         return updated
@@ -62,13 +56,13 @@ class ElasticManager(metaclass=MetaSingleton):
         return search.delete()
 
     def searh_by_map(self, index, query_map: map):
-        search = Search(using = self.__client__, index = index)
+        search = Search(using=self.__client__, index=index)
         for key, value in query_map.items():
             search.query = Q(
                 'bool',
-                should = [Q('match', **{key: value})]
+                should=[Q('match', **{key: value})]
             )
         search.query(
-            minimum_should_match = len(query_map.values())
+            minimum_should_match=len(query_map.values())
         )
         return search

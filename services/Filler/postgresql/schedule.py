@@ -13,9 +13,11 @@ sys.path.append(parentdir)
 class Schedule(Table):
     TABLE_NAME = 'schedule'
 
-    def __init__(self, clear = False):
-        self.psql = PsqlManager(os.getenv('POSTGRES_DBASE_IP'), os.getenv('POSTGRES_PORT_FIRST'),
-                                os.getenv('POSTGRES_DBASE_LOGIN'), os.getenv('POSTGRES_DBASE_PASSWORD'))
+    def __init__(self, clear=False):
+        self.psql = PsqlManager(
+            os.getenv('POSTGRES_DBASE_IP'), os.getenv('POSTGRES_PORT_FIRST'),
+            os.getenv('POSTGRES_DBASE_LOGIN'), os.getenv('POSTGRES_DBASE_PASSWORD')
+        )
         if clear:
             self.clear()
         self.create_table()

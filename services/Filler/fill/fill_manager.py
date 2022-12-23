@@ -19,9 +19,10 @@ from names import get_first_name, get_last_name
 from utils import parse_data, check_chance, generate_group_name, get_lesson_date, get_foreign_courses
 
 TYPES = [
-  'Лекция',
-  'Практика'
+    'Лекция',
+    'Практика'
 ]
+
 
 def fill():
     institutes = __fill_institutes()
@@ -46,24 +47,27 @@ def __fill_institutes():
     institutes.make_neo4j_shortcuts()
     return institutes
 
+
 def __fill_groups(specialities_codes):
     groups = Groups(clear=True)
-    for id in specialities_codes:
-        for groups_count in range(2): #2, 5
+    for spec_id in specialities_codes:
+        for groups_count in range(2):  # 2, 5
             group_name = generate_group_name()
-            groups.insert(group_name, id)
+            groups.insert(group_name, spec_id)
     return groups
-    
+
+
 def __fill_lessons(courses_id: list, institutes):
     courses_names = institutes.get_course_names_by_ids(courses_id)
     lessons = Lessons(clear=True)
     descriptions = Descriptions()
     for i in range(len(courses_id)):
-        for lection_num in range(2, 5): #6,12
+        for lection_num in range(2, 5):  # 6,12
             lessons.insert(TYPES[0], courses_id[i], courses_names[i], descriptions.insert())
-        for practic_num in range(3, 5): #8,16
+        for practic_num in range(3, 5):  # 8,16
             lessons.insert(TYPES[1], courses_id[i], courses_names[i], descriptions.insert())
     return lessons
+
 
 def __fill_schedule(institutes, lessons, groups):
     schedule = Schedule(clear=True)
@@ -118,11 +122,11 @@ def __fill_schedule(institutes, lessons, groups):
     return schedule, groups_schedule
 
 
-def __fill_students(groups, schedule, lessons, institutes, min=4, max=8): #15,30
+def __fill_students(groups, schedule, lessons, institutes, min=4, max=8):  # 15,30
     graph = Graph()
     redis_students = redis_db.students.Students(
         host=str(os.getenv('REDIS_DBASE_IP')),
-        port=os.getenv('REDIS_DBASE_PORT'), 
+        port=os.getenv('REDIS_DBASE_PORT'),
         clear=True
     )
     postgres_students = postgresql.students.Students(clear=True)
@@ -136,12 +140,12 @@ def __fill_students(groups, schedule, lessons, institutes, min=4, max=8): #15,30
             student = redis_students.insert(name=name, surname=surname, group_name=group_name)
             groups_students[group_name].append(student)
             postgres_students.insert(student, group_name, name, surname)
-            
+
         lesson_ids = [lesson[0] for lesson in schedule.read_lessons_by_group(group_name)]
         courses = [course[0] for course in lessons.read_by_lesson_ids(lesson_ids)]
         course_names = institutes.get_course_names_by_ids(courses)
         graph.create_student_course_tie(group_name=group_name, course_names=course_names)
-        
+
     return groups_students
 
 
@@ -149,7 +153,6 @@ def __fill_visits(groups_schedule, groups_students):
     visits = Visits(clear=True)
     schedule = Schedule()
     graph = Graph()
-    i = 0
     for group in groups_schedule:
         for schedule_id_date in groups_schedule[group]:
             for student in groups_students[group]:

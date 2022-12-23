@@ -20,10 +20,10 @@ class StudentsParams(BaseModel):
 @app.post('/students')
 async def students(body: StudentsParams) -> List:
     requested_students = []
-    for key in body.students_id:
-        temp = manager.read(key)
-        temp["key"] = key
-        requested_students.append(temp)
+    for student_id in body.students_id:
+        student = manager.read(student_id)
+        student["key"] = student_id
+        requested_students.append(student)
     return requested_students
 
 

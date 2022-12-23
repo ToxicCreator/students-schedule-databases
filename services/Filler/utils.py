@@ -17,7 +17,7 @@ def check_chance(chance) -> bool:
 def generate_group_name() -> str:
     letters = "БСБОКМПФРСГУДИЭХТВ"
 
-    groupCode = ''.join(choice(letters) for i in range(4))
+    groupCode = ''.join(choice(letters) for _ in range(4))
     groupCode += "-0"
     groupCode += str(randint(1, 9))
     groupCode += "-"

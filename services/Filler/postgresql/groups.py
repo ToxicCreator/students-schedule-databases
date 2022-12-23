@@ -9,14 +9,17 @@ currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
 
+
 class Groups(Table):
     TABLE_NAME = 'groups'
 
     def __init__(self, clear=False):
-        self.psql = PsqlManager(os.getenv('POSTGRES_DBASE_IP'), os.getenv('POSTGRES_PORT_FIRST'),
-                                os.getenv('POSTGRES_DBASE_LOGIN'), os.getenv('POSTGRES_DBASE_PASSWORD'))
+        self.psql = PsqlManager(
+            os.getenv('POSTGRES_DBASE_IP'), os.getenv('POSTGRES_PORT_FIRST'),
+            os.getenv('POSTGRES_DBASE_LOGIN'), os.getenv('POSTGRES_DBASE_PASSWORD'),
+        )
         self.graph = Graph()
-        
+
         if clear:
             self.clear()
         self.create_table()
@@ -36,8 +39,7 @@ class Groups(Table):
             'speciality_id': speciality_id
         }
         self.psql.insert(self.TABLE_NAME, values)
-        self.graph.create_group_node(name=name,
-                                     spec_code=speciality_id)
+        self.graph.create_group_node(name=name, spec_code=speciality_id)
         return name
 
     def read(self, name) -> tuple:

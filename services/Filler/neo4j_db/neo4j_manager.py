@@ -2,7 +2,8 @@ from neo4j import GraphDatabase
 from singleton import MetaSingleton
 import os
 
-class Neo4jManager(metaclass = MetaSingleton):
+
+class Neo4jManager(metaclass=MetaSingleton):
 
     def __init__(self):
         self.database = GraphDatabase.driver(
@@ -50,4 +51,4 @@ class Neo4jManager(metaclass = MetaSingleton):
         print('Remove nodes with relationships.')
 
     def execute(self, query, params):
-        return self.session.run(query, params = params)
+        return self.session.run(query, params=params)

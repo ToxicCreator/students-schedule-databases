@@ -13,12 +13,15 @@ sys.path.append(parentdir)
 database_name = 'prac_3'
 collection_name = 'institutes'
 
+
 class Institutes:
     institutes: dict
+
     def __init__(self, clear=False):
-        self.mongo = MongoManager(host=os.getenv('MONGO_DBASE_IP'),
-                                  port=int(os.getenv('MONGO_DBASE_PORT_SECOND')),
-                                  db_name=database_name)
+        self.mongo = MongoManager(
+            host=os.getenv('MONGO_DBASE_IP'),
+            port=int(os.getenv('MONGO_DBASE_PORT_SECOND')),
+            db_name=database_name)
         self.graph = Graph()
         time.sleep(10)
         if clear:
@@ -39,12 +42,13 @@ class Institutes:
             for department in institute['Departments']:
                 self.graph.create_department_node(name=department['Name'])
                 for speciality in department['Specialities']:
-                    self.graph.create_speciality_node(name=speciality['Name'],
-                                                      code=speciality['Code'],
-                                                      department_name=department['Name'])
+                    self.graph.create_speciality_node(
+                        name=speciality['Name'],
+                        code=speciality['Code'],
+                        department_name=department['Name']
+                    )
                 for course in department['Courses']:
-                    self.graph.create_course_node(name=course['Name'],
-                                                  department_name=department['Name'])
+                    self.graph.create_course_node(name=course['Name'], department_name=department['Name'])
 
     def get_specialities_codes(self):
         codes = []
@@ -64,7 +68,7 @@ class Institutes:
             for department in institute['Departments']:
                 for course in department['Courses']:
                     courses.append(course['ID'])
-                    
+
         return courses
 
     def get_departments_courses(self):
@@ -96,8 +100,6 @@ class Institutes:
                     if course['ID'] in course_ids:
                         course_names.append(course['Name'])
         return course_names
-
-
 
     def read(self, filter):
         return self.collection.find(filter, {'_id': 0})

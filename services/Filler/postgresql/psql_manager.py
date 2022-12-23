@@ -6,15 +6,16 @@ from singleton import MetaSingleton
 
 database = "postgres"
 
-class PsqlManager(metaclass = MetaSingleton):
+
+class PsqlManager(metaclass=MetaSingleton):
 
     def __init__(self, host, port, login, password):
         self.connection = psycopg2.connect(
-            database = database,
-            user = login,
-            password = password,
-            host = host,
-            port = port
+            database=database,
+            user=login,
+            password=password,
+            host=host,
+            port=port
         )
         self.cursor = self.connection.cursor()
 

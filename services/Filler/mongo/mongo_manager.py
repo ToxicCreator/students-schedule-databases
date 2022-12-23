@@ -3,10 +3,10 @@ from singleton import MetaSingleton
 
 
 # docker run -d --name mongo-cnt -p 27017:27017 mongo
-class MongoManager(metaclass = MetaSingleton):
+class MongoManager(metaclass=MetaSingleton):
 
     def __init__(self, host, port, db_name):
-        client = MongoClient(host = host, port = port)
+        client = MongoClient(host=host, port=port)
         self.db = client[db_name]
 
     def collection(self, collection_name):

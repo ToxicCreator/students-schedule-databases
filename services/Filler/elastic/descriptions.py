@@ -18,13 +18,16 @@ sys.path.append(parentdir)
 EQUIPMENT = ["компьютер", "проектор", "маркерная доска", "флеш-накопитель", "смарт-токен", "сетевой шкаф", "кликер",
              "набор маркеров", "проекционная доска", "чертежные наборы", "образ виртуальной машины kali linux"]
 
+
 class Descriptions:
     TABLE_NAME = 'description'
     INDEX_NAME = 'lessons'
 
     def __init__(self, clear=False):
-        self.manager = ElasticManager(host=os.getenv('ELASTIC_DBASE_IP'),
-                                      port=os.getenv('ELASTIC_DBASE_PORT'))
+        self.manager = ElasticManager(
+            host=os.getenv('ELASTIC_DBASE_IP'),
+            port=os.getenv('ELASTIC_DBASE_PORT')
+        )
         self.generator_api = FishTextJson(text_type=TextType.Title)
         time.sleep(10)
         if clear:
@@ -46,13 +49,10 @@ class Descriptions:
         titles = self.generator_api.get(10)
         return '. '.join(titles.text.split("\\n\\n"))
 
-
     @staticmethod
     def get_random_equipment():
         equipment_ = EQUIPMENT[randint(0, 5):randint(6, 10)]
         return ', '.join(equipment_).rstrip(', ')
-
-
 
     def read(self, search):
         return self.manager.read_query(
@@ -66,11 +66,11 @@ class Descriptions:
             query_map
         )
         for hit in documents:
-            id = hit.meta.id
+            doc_id = hit.meta.id
             doc_type = hit.meta.doc_type
-            result = self.manager.update(
+            self.manager.update(
                 index=self.INDEX_NAME,
-                id=id,
+                id=doc_id,
                 doc_type=doc_type,
                 doc=new_value
             )

@@ -1,5 +1,6 @@
 import os
 import requests
+import json
 import itertools
 
 ELASTIC_SERVICE_IP = os.getenv('ELASTIC_SERVICE_IP')
@@ -21,6 +22,8 @@ neo4j_url = f'http://{NEO4J_SERVICE_IP}:{NEO4J_SERVICE_PORT}/'
 
 def makeFirstRequest(start: str, end: str, term: str) -> dict:
     description_id = get_description_id(term)
+    if not description_id:
+        return {"No such descrtiption with this term"}
     lessons_id = get_lessons_id_by(description_id)
     visits_id = get_visits_id_by(lessons_id)
     students_visits = get_percentage_of_visits_by_date(
@@ -30,9 +33,9 @@ def makeFirstRequest(start: str, end: str, term: str) -> dict:
     )
     students_id = [student[0] for student in students_visits]
     students = get_students(students_id)
-    for i, dict_ in enumerate(students):
+    for i, student in enumerate(students):
         for j in range(len(students_visits)):
-            if students_visits[j][0] == dict_["key"]:
+            if students_visits[j][0] == student["key"]:
                 students[i]["percent_of_attendance"] = students_visits[j][1]
     result_dict = {
         'date_start': start,
@@ -41,6 +44,7 @@ def makeFirstRequest(start: str, end: str, term: str) -> dict:
         "students": students
     }
     return result_dict
+
 
 def get_description_id(term: str) -> dict:
     url = elastic_ip + 'description'
@@ -52,6 +56,7 @@ def get_description_id(term: str) -> dict:
     )
     return result.json()
 
+
 def get_lessons_id_by(descriptions_id):
     url = postgres_url + 'lessons-by-desscriptions-id'
     query_body = {
@@ -59,12 +64,14 @@ def get_lessons_id_by(descriptions_id):
     }
     return requests.post(url=url, json=query_body).json()
 
+
 def get_visits_id_by(lessons_id):
     url = neo4j_url + 'visits-by-lessons-id'
     query_body = {
         "lessons_id": list(itertools.chain(*lessons_id))
     }
     return requests.post(url=url, json=query_body).json()
+
 
 def get_percentage_of_visits_by_date(date_start, date_end, visits_id):
     url = postgres_url + 'percentage-of-visits-by-date'
@@ -74,6 +81,7 @@ def get_percentage_of_visits_by_date(date_start, date_end, visits_id):
         "end": date_end
     }
     return requests.post(url=url, json=query_body).json()
+
 
 def get_students(students_id):
     url = redis_url + 'students'
