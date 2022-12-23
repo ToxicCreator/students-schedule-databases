@@ -16,9 +16,9 @@ redis_url = f'http://{REDIS_SERVICE_IP}:{REDIS_SERVICE_PORT}/'
 
 
 def makeFirstRequest(start: str, end: str, term: str) -> dict:
-    lessons_id = get_lessons_id_by_description(term)
+    description_id = get_description_id(term)
     students_visits = get_percentage_of_visits(
-        lessons_id=lessons_id,
+        description_id=description_id,
         start=start,
         end=end
     ).json()
@@ -37,7 +37,7 @@ def makeFirstRequest(start: str, end: str, term: str) -> dict:
     return result_dict
 
 
-def get_lessons_id_by_description(term: str) -> dict:
+def get_description_id(term: str) -> dict:
     url = elastic_ip + 'description'
     result = requests.get(
         url=url,
@@ -48,10 +48,10 @@ def get_lessons_id_by_description(term: str) -> dict:
     return result.json()
 
 
-def get_percentage_of_visits(lessons_id, start, end) -> requests.Response:
+def get_percentage_of_visits(description_id, start, end) -> requests.Response:
     url = postgres_url + 'percentage-of-visits'
     postgres_body = {
-        'lessons_id': lessons_id,
+        'description_id': description_id,
         'start': start,
         'end': end
     }

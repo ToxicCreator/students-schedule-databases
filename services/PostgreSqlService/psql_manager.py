@@ -6,8 +6,7 @@ from typing import List
 class PsqlManager:
 
     def __init__(self):
-        self.cursor = None
-        self.__connection = None
+        self.connect()
 
     def check_connection(self):
         try:

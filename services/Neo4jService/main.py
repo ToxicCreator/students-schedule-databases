@@ -1,6 +1,5 @@
 from fastapi import FastAPI
 import uvicorn
-import os
 import time
 from neo4j_manager import Neo4jManager
 

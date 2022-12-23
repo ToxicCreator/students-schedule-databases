@@ -7,7 +7,7 @@ from typing import Dict
 class ElasticManager:
 
     def __init__(self):
-        self.__client: Elasticsearch = None
+        self.connect()
 
     def check_connection(self) -> bool:
         return self.__client.ping()

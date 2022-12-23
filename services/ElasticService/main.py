@@ -4,7 +4,6 @@ import uvicorn
 
 app = FastAPI()
 manager = ElasticManager()
-manager.connect()
 
 
 @app.get('/')

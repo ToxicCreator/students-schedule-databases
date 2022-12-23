@@ -6,7 +6,7 @@ from typing import Union, Awaitable, List
 class RedisManager:
 
     def __init__(self):
-        self.__database: redis.Redis = None
+        self.connect()
 
     def check_connection(self) -> bool:
         try:
@@ -35,7 +35,7 @@ class RedisManager:
     def read(self, key: str) -> Union[Awaitable[dict], dict]:
         return self.__database.hgetall(key)
 
-    def print_all(self) -> List:
+    def print_all(self):
         keys = self.__database.keys('*')
         for key in keys:
             print(key)
