@@ -120,8 +120,11 @@ def __fill_schedule(institutes, lessons, groups):
 
 def __fill_students(groups, schedule, lessons, institutes, min=15, max=30):
     graph = Graph()
-    redis_students = redis_db.students.Students(host=str(os.getenv('REDIS_DBASE_IP')),
-                                                port=os.getenv('REDIS_DBASE_PORT'), clear=True)
+    redis_students = redis_db.students.Students(
+        host=str(os.getenv('REDIS_DBASE_IP')),
+        port=os.getenv('REDIS_DBASE_PORT'), 
+        clear=True
+    )
     postgres_students = postgresql.students.Students(clear=True)
     groups_students = {}
     for group in groups:
@@ -144,11 +147,16 @@ def __fill_students(groups, schedule, lessons, institutes, min=15, max=30):
 
 def __fill_visits(groups_schedule, groups_students):
     visits = Visits(clear=True)
+    schedule = Schedule()
+    graph = Graph()
     i = 0
     for group in groups_schedule:
         for schedule_id_date in groups_schedule[group]:
             for student in groups_students[group]:
-                visits.insert(schedule_id_date[0], student, schedule_id_date[1], check_chance(90))
+                schedule_id = schedule_id_date[0]
+                lesson_id = schedule.read(schedule_id)[0][2]
+                visit_id = visits.insert(schedule_id, student, schedule_id_date[1], check_chance(90))
+                graph.create_visit_node(visit_id, lesson_id)
 
 
 if __name__ == "__main__":

@@ -35,7 +35,7 @@ async def percentage_of_visits(body: PercentageOfVisitsParams):
             (count(*) FILTER (WHERE v.visited = TRUE))::float / count(*) * 100 
                 as percentage_of_visits
         FROM schedule sch
-            JOIN visits v ON sch.id = v.shedule_id
+            JOIN visits v ON sch.id = v.schedule_id
             JOIN lessons ls ON sch.lesson_id = ls.id
         WHERE ls.description_id IN ('{"', '".join(body.description_id)}')
             AND v.date BETWEEN '{body.start}' AND '{body.end}'

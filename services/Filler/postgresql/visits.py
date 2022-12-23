@@ -23,7 +23,7 @@ class Visits(Table):
         query = f'''
             CREATE TABLE IF NOT EXISTS {self.TABLE_NAME} (
                 id serial PRIMARY KEY NOT NULL,
-                shedule_id int NOT NULL,
+                schedule_id int NOT NULL,
                 student_id VARCHAR(7) NOT NULL,
                 date date NOT NULL,
                 visited boolean NOT NULL
@@ -36,14 +36,14 @@ class Visits(Table):
         with open("postgresql/visitsPartitionCfg.txt") as file:
             self.psql.execute_and_commit(file.read())
 
-    def insert(self, shedule_id, student_id, date, visited = False):
+    def insert(self, schedule_id, student_id, date, visited = False):
         map_key_values = {
-            'shedule_id' : shedule_id,
+            'schedule_id' : schedule_id,
             'student_id' : student_id,
             'date' : date,
             'visited': visited
         }
-        self.psql.insert(self.TABLE_NAME, map_key_values)
+        return self.psql.insert(self.TABLE_NAME, map_key_values)[0]
 
     def read(self, studentID, lessonID):
         query = f'''

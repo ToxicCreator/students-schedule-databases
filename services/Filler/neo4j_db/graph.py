@@ -21,8 +21,9 @@ class Graph:
         })
 
     def create_department_node(self, name):
-        return self.client.create_node('department',
-                                       {'Name': name})
+        return self.client.create_node('department', {
+            'Name': name
+        })
 
     def create_speciality_node(self, name, code, department_name):
         query = f'''
@@ -49,10 +50,10 @@ class Graph:
 
     def create_group_node(self, name, spec_code):
         query = f'''
-                   MATCH (s:speciality {{Code: '{spec_code}'}})
-                   CREATE (g:group)-[:member_of]->(s)
-                   SET g = $params;
-               '''
+            MATCH (s:speciality {{Code: '{spec_code}'}})
+            CREATE (g:group)-[:member_of]->(s)
+            SET g = $params;
+        '''
         return self.client.execute(query, {
             'Name': name
         }).single()
@@ -67,17 +68,13 @@ class Graph:
             'RecordBook': recordbook
         }).single()
 
-    def create_visit_node(self, lesson_id, student_id, visited):
-        rel = 'unvisited'
-        if visited:
-            rel = 'visited'
+    def create_visit_node(self, visit_id, lesson_id):
         query = f'''
             MATCH (l:lesson {{id: {lesson_id}}}) WITH l
-            MATCH (s:student {{id: '{student_id}'}})
-            CREATE (s)-[r:{rel}]->(l)
-            RETURN l, s, r;
+            CREATE (v:visit {{id: {visit_id}}})-[r:refers_to]->(l)
+            RETURN v, r;
         '''
-        return self.client.execute(query).single()
+        return self.client.execute(query, {}).single()
 
     def create_student_course_tie(self, group_name, course_names):
         query = f'''
@@ -88,10 +85,10 @@ class Graph:
 
     def create_lesson_node(self, lesson_id, course_name):
         query = f'''
-           MATCH (c:course {{Name: '{course_name}'}})
-           CREATE (l:lesson)-[:part_of]->(c)
-           SET l = $params
-           RETURN l;
+            MATCH (c:course {{Name: '{course_name}'}})
+            CREATE (l:lesson)-[:part_of]->(c)
+            SET l = $params
+            RETURN l;
         '''
         return self.client.execute(query, {
             'Id': lesson_id

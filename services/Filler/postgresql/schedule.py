@@ -57,9 +57,9 @@ class Schedule(Table):
 
     def read_lessons_by_group(self, group_name):
         query = f'''
-                   SELECT lesson_id FROM {self.TABLE_NAME} 
-                   WHERE group_id = '{group_name}'
-                '''
+            SELECT lesson_id FROM {self.TABLE_NAME} 
+            WHERE group_id = '{group_name}'
+        '''
         self.psql.execute_and_commit(query)
         return self.psql.cursor.fetchall()
 
