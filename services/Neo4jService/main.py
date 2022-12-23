@@ -20,14 +20,11 @@ class VisitsQueryBody(BaseModel):
 
 @app.post('/visits-by-lessons-id')
 async def visits_by_lessons_id(body: VisitsQueryBody):
-    listing_ = [str(item) for item in body.lessons_id]
-    listing = ", ".join(listing_)
-    print('LESSONS_IDS_IN_NEO4J', listing)
+    listing = ", ".join(str(item) for item in body.lessons_id)
     query = f'''
         MATCH (v:visit)-[:refers_to]->(l:lesson) WHERE l.Id in [{listing}] RETURN v.id
     '''
     result = manager.execute_query(query)
-    print('RESULT', result)
     return list(result)
 
 
